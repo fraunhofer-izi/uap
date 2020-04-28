@@ -20,15 +20,15 @@ Robustness
 * Data is processed in temporary location.
   If and only if ALL involved processes exited graceful, the output files are
   copied to the final output directory.
-* The final output directory names are suffixed with a hashtag which is based
-  on the commands executed to generate the output data.
-  Data is not easily overwritten and this helps to check for necessary
-  recomputations.
+.. * The final output directory names are suffixed with a hashtag which is based
+..   on the commands executed to generate the output data.
+..   Data is not easily overwritten and this helps to check for necessary
+..  recomputations.
 * Processing can be aborted and continued from the command line at any time.
   Failures during data processing do not lead to unstable state of analysis.
 * Errors are reported as early as possible, fail-fast.
   Tools are checked for availability, and the entire processing pipeline is
-  calculated in advance before jobs are being started or submitted to a cluster.
+  calculated in advance before jobs are started or submitted to a cluster.
 
 .. _uap-consistency:
 
@@ -101,7 +101,7 @@ Connections: Propagation of Data
 ================================
 
 **Connections** are like tubes that connect steps.
-A step can have any number of connections.
+A sstep can have any number of connections.
 Run have to assign output file(s) to each connection of the step.
 Downstream steps can access the connections to get the information which run
 created which file.
