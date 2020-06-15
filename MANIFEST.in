@@ -1,4 +1,0 @@
-recursive-include doc/*
-recursive-include example-configurations/*
-recursive-include submit-scripts/*
-recursive-include tools/*
