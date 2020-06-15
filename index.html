@@ -1,0 +1,502 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>uap -- Universal Analysis Pipeline &mdash; uap 2.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introducing uap" href="introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> uap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introducing <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#software-design">Software Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#recommended-uap-workflow">Recommended <strong>uap</strong> Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to.html">Quick Start <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Analysis Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html#cluster-configuration-file">Cluster Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interaction.html">Command-Line Usage of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="extension.html">Add New Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Tested Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annotation.html">Annotation Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="steps.html">Available steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Information for uap Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">uap</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>uap -- Universal Analysis Pipeline</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="uap-robust-consistent-and-reproducible-data-analysis">
+<span id="uap-index"></span><h1>uap – Robust, Consistent, and Reproducible Data Analysis<a class="headerlink" href="#uap-robust-consistent-and-reproducible-data-analysis" title="Permalink to this headline">¶</a></h1>
+<p><strong>Authors:</strong></p>
+<p>Christoph Kämpf, Michael Specht, Sven-Holger Puppel, Alexander Scholz,
+Gero Doose, Kristin Reiche, Jana Hertel, Jörg Hackermüller</p>
+<p><strong>Description:</strong></p>
+<blockquote>
+<div><p><strong>uap</strong> executes, controls and keeps track of the analysis of large data sets.
+It enables users to perform robust, consistent, and reproducible data analysis.
+<strong>uap</strong> encapsulates the usage of (bioinformatic) tools and handles data flow
+and processing during an analysis.
+Users can use predefined or self-made analysis steps to create custom analysis.
+Analysis steps encapsulate best practice usages for bioinformatic software
+tools.
+<strong>uap</strong> focuses on the analysis of high-throughput sequencing (HTS) data.
+But its plugin architecture allows users to add functionality, such that
+it can be used for any kind of large data analysis.</p>
+</div></blockquote>
+<p><strong>Usage:</strong></p>
+<blockquote>
+<div><p><strong>uap</strong> is a command-line tool, implemented in Python.
+It requires a user-defined configuration file, which describes the analysis,
+as input.</p>
+</div></blockquote>
+<p><strong>Supported Platforms:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Unix-like operating systems.</p></li>
+<li><p>High Performance Compute (HPC) cluster systems such as <a href="http://www.univa.com/products/" target="_blank">UGE</a>,
+<a href="http://www.univa.com/oracle" target="_blank">OGE/SGE</a> and <a href="http://slurm.schedmd.com/" target="_blank">SLURM</a>.</p></li>
+<li><p>see <a class="reference internal" href="platforms.html"><span class="doc">Tested Platforms</span></a> for detailed information</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Important Information</strong></p>
+<blockquote>
+<div><p><strong>uap</strong> does <strong>NOT</strong> include all tools necessary for the data analysis.
+It expects that the required tools are <strong>already installed</strong>.</p>
+</div></blockquote>
+<div class="section" id="table-of-contents">
+<h2>Table of contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introducing <strong>uap</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#core-aspects">Core aspects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="introduction.html#robustness">Robustness</a></li>
+<li class="toctree-l3"><a class="reference internal" href="introduction.html#consistency">Consistency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="introduction.html#reproducibility">Reproducibility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="introduction.html#usability">Usability</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#software-design">Software Design</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#source-and-processing-steps-building-blocks-of-the-analysis">Source and Processing Steps: Building Blocks of the Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#runs-atomic-units-of-the-analysis">Runs: Atomic Units of the Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#connections-propagation-of-data">Connections: Propagation of Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#analysis-as-directed-acyclic-graph">Analysis as Directed Acyclic Graph</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#recommended-uap-workflow">Recommended <strong>uap</strong> Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to.html">Quick Start <strong>uap</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how-to.html#handle-genomic-data">Handle Genomic Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how-to.html#sequencing-data-analysis">Sequencing Data Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="how-to.html#general-steps">General Steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="how-to.html#rnaseq-example-reanalysing-data-from-mercer-link">RNAseq Example – Reanalysing Data from <a href="https://www.ncbi.nlm.nih.gov/pubmed/24705597" target="_blank">Mercer <i>et al.</i>, Nature Protoc. (2014)</a></a></li>
+<li class="toctree-l3"><a class="reference internal" href="how-to.html#chipseq-example-reanalysing-data-from-barski-link">ChIPseq Example – Reanalysing Data from <a href="http://www.ncbi.nlm.nih.gov/pubmed/17512414" target="_blank">Barski <i>et al.</i>, Cell (2007)</a></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of <strong>uap</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#downloading-the-software">Downloading the Software</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#setting-up-python-environment">Setting Up Python Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#making-uap-globally-available">Making <strong>uap</strong> Globally Available</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Analysis Configuration File</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#sections-of-a-configuration-file">Sections of a Configuration File</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#destination-path-section"><code class="docutils literal notranslate"><span class="pre">destination_path</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#base-working-directory-section"><code class="docutils literal notranslate"><span class="pre">base_working_directory</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#constants-section"><code class="docutils literal notranslate"><span class="pre">constants</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#steps-section"><code class="docutils literal notranslate"><span class="pre">steps</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#tools-section"><code class="docutils literal notranslate"><span class="pre">tools</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#lmod-section"><code class="docutils literal notranslate"><span class="pre">lmod</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#cluster-section"><code class="docutils literal notranslate"><span class="pre">cluster</span></code> Section</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#example-configurations">Example Configurations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html#cluster-configuration-file">Cluster Configuration File</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#submit-script-template">Submit Script Template</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="interaction.html">Command-Line Usage of <strong>uap</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="interaction.html#subcommands">Subcommands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interaction.html#steps-subcommand"><code class="docutils literal notranslate"><span class="pre">steps</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interaction.html#status-subcommand"><code class="docutils literal notranslate"><span class="pre">status</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interaction.html#run-info-subcommand"><code class="docutils literal notranslate"><span class="pre">run-info</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interaction.html#run-locally-subcommand"><code class="docutils literal notranslate"><span class="pre">run-locally</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interaction.html#submit-to-cluster-subcommand"><code class="docutils literal notranslate"><span class="pre">submit-to-cluster</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interaction.html#fix-problems-subcommand"><code class="docutils literal notranslate"><span class="pre">fix-problems</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interaction.html#volatilize-subcommand"><code class="docutils literal notranslate"><span class="pre">volatilize</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interaction.html#render-subcommand"><code class="docutils literal notranslate"><span class="pre">render</span></code> Subcommand</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="extension.html">Add New Functionality</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="extension.html#implement-new-steps">Implement New Steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="extension.html#step-1-import-statements-and-logger">Step 1: Import Statements and Logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extension.html#step-2-class-definition">Step 2: Class Definition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extension.html#step-3-init-method">Step 3: <code class="docutils literal notranslate"><span class="pre">__init__</span></code> Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extension.html#step-4-runs-method">Step 4: <code class="docutils literal notranslate"><span class="pre">runs</span></code> Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="extension.html#step-5-add-the-new-step-to-uap">Step 5: Add the new step to <strong>uap</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="extension.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="extension.html#usage-of-dd-and-mkfifo">Usage of <code class="docutils literal notranslate"><span class="pre">dd</span></code> and <code class="docutils literal notranslate"><span class="pre">mkfifo</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Tested Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annotation.html">Annotation Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="annotation.html#known-paths">known_paths</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="steps.html">Available steps</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="steps.html#source-steps">Source steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#bcl2fastq2-source">bcl2fastq2_source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#bcl2fastq-source">bcl2fastq_source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#fastq-source">fastq_source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#fetch-chrom-sizes-source">fetch_chrom_sizes_source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#raw-file-source">raw_file_source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#raw-file-sources">raw_file_sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#raw-url-source">raw_url_source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#raw-url-sources">raw_url_sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#run-folder-source">run_folder_source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="steps.html#processing-steps">Processing steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#adapterremoval">adapterremoval</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#bam-to-bedgraph-and-bigwig">bam_to_bedgraph_and_bigwig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#bam-to-genome-browser">bam_to_genome_browser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#bowtie2">bowtie2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#bowtie2-generate-index">bowtie2_generate_index</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#bwa-backtrack">bwa_backtrack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#bwa-generate-index">bwa_generate_index</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#bwa-mem">bwa_mem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#cat-text">cat_text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#chimpipe">chimpipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#chromhmm-binarizebam">chromhmm_binarizebam</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#chromhmm-learnmodel">chromhmm_learnmodel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#collect-scs">collect_scs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#copy-file">copy_file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#count-rrna">count_rRNA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#cuffcompare">cuffcompare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#cufflinks">cufflinks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#cuffmerge">cuffmerge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#cutadapt">cutadapt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#deeptools-bamcompare">deepTools_bamCompare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#deeptools-bampefragmentsize">deepTools_bamPEFragmentSize</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#deeptools-multibamsummary">deepTools_multiBamSummary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#deeptools-plotfingerprint">deepTools_plotFingerprint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#discardlargesplitsandpairs">discardLargeSplitsAndPairs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#fastq-screen">fastq_screen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#fastqc">fastqc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#fastqsample">fastqsample</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#fastx-quality-stats">fastx_quality_stats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#fastx-reverse-complement">fastx_reverse_complement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#feature-counts">feature_counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#filter-gtf">filter_gtf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#fix-cutadapt">fix_cutadapt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#fusioncatcher">fusioncatcher</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#gffcompare-single">gffcompare_single</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#gffread-extract-transcripts">gffread_extract_transcripts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#gsnap">gsnap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#hisat2">hisat2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#htseq-count">htseq_count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#index-47">identify_adapters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#kallisto">kallisto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#kallisto-fusion">kallisto_fusion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#kallisto-index">kallisto_index</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#macs2">macs2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#merge-assembly">merge_assembly</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#merge-fasta-files">merge_fasta_files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#merge-fastq-files">merge_fastq_files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#merge-fastx-files">merge_fastx_files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#merge-genecounts">merge_genecounts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#merge-numpy-zip-arrays">merge_numpy_zip_arrays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#pear">pear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#pepr">pepr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#pepr-postprocess">pepr_postprocess</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#picard-add-replace-read-groups">picard_add_replace_read_groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#picard-collectrnaseqmetrics">picard_collectrnaseqmetrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#picard-markduplicates">picard_markduplicates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#picard-merge-sam-bam-files">picard_merge_sam_bam_files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#piranha">piranha</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#pizzly">pizzly</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#post-cufflinkssuite">post_cufflinksSuite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#post-sawdust">post_sawdust</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#preseq-complexity-curve">preseq_complexity_curve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#preseq-future-genome-coverage">preseq_future_genome_coverage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#preseq-future-yield">preseq_future_yield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#reformatcigar">reformatCigar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#remove-duplicate-reads-runs">remove_duplicate_reads_runs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#rgt-thor">rgt_thor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#rseqc">rseqc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#s2c">s2c</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#salmon">salmon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#sam-to-fastq">sam_to_fastq</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#sam-to-sorted-bam">sam_to_sorted_bam</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#samtools">samtools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#samtools-faidx">samtools_faidx</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#samtools-index">samtools_index</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#samtools-merge">samtools_merge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#samtools-sort">samtools_sort</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#samtools-stats">samtools_stats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#segemehl">segemehl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#segemehl-2017">segemehl_2017</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#segemehl-generate-index">segemehl_generate_index</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#segemehl-generate-index-bisulfite">segemehl_generate_index_bisulfite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#soapfuse">soapfuse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#source-controller">source_controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#split-fastq">split_fastq</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#sra-fastq-dump">sra_fastq_dump</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#star">star</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#stringtie">stringtie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#stringtiemerge">stringtieMerge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#stringtie-prepde">stringtie_prepDE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#subsetmappedreads">subsetMappedReads</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#tcount2gcount">tcount2gcount</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#tophat2">tophat2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#trim-galore">trim_galore</a></li>
+<li class="toctree-l3"><a class="reference internal" href="steps.html#trimmomatic">trimmomatic</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#pipeline-specific-modules">Pipeline-specific modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-abstract_step">abstract_step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-pipeline">pipeline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-run">run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-task">task</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#miscellaneous-modules">Miscellaneous modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-process_pool">process_pool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-fscache">fscache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-misc">misc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#connections-collector">connections_collector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Information for uap Developers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developers.html#documentation">Documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developers.html#create-documentation-locally">Create Documentation Locally</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developers.html#create-documentation-on-rtd">Create Documentation on RTD</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developers.html#continuous-integration">Continuous Integration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developers.html#travis-yml">.travis.yml</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="remarks">
+<h2>Remarks<a class="headerlink" href="#remarks" title="Permalink to this headline">¶</a></h2>
+<p>This documentation has been created using <a href="http://www.sphinx-doc.org/" target="_blank">sphinx</a> and <a href="http://docutils.sourceforge.net/rst.html" target="_blank">reStructuredText</a>.</p>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="introduction.html" class="btn btn-neutral float-right" title="Introducing uap" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christoph Kämpf, Michael Specht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,1212 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>run &mdash; uap 2.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> uap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introducing <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html#software-design">Software Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html#recommended-uap-workflow">Recommended <strong>uap</strong> Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to.html">Quick Start <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Analysis Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html#cluster-configuration-file">Cluster Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interaction.html">Command-Line Usage of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extension.html">Add New Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platforms.html">Tested Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotation.html">Annotation Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../steps.html">Available steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers.html">Information for uap Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">uap</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>run</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for run</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">fscache</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pwd</span>
+<span class="kn">import</span> <span class="nn">stat</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">from</span> <span class="nn">deepdiff</span> <span class="kn">import</span> <span class="n">DeepDiff</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">import</span> <span class="nn">abstract_step</span> <span class="k">as</span> <span class="nn">abst</span>
+<span class="kn">import</span> <span class="nn">command</span> <span class="k">as</span> <span class="nn">command_info</span>
+<span class="kn">import</span> <span class="nn">exec_group</span>
+<span class="kn">import</span> <span class="nn">pipeline_info</span>
+<span class="kn">import</span> <span class="nn">misc</span>
+<span class="kn">from</span> <span class="nn">uaperrors</span> <span class="kn">import</span> <span class="n">UAPError</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;uap_logger&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">cache</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A decorator to cache a functions return value with self.fsc.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">function_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)]</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">function_name</span> <span class="o">+</span> <span class="p">[</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">])</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">cache</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">inner</span>
+
+
+<div class="viewcode-block" id="Run"><a class="viewcode-back" href="../api.html#run.Run">[docs]</a><span class="k">class</span> <span class="nc">Run</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The Run class is a helper class which represents a run in a step. Declare</span>
+<span class="sd">    runs inside AbstractStep.runs() via::</span>
+
+<span class="sd">        with self.new_run(run_id) as run:</span>
+<span class="sd">            # declare output files, private and public info here</span>
+
+<span class="sd">    After that, use the available methods to configure the run.</span>
+<span class="sd">    The run has typically no information about input connections only about</span>
+<span class="sd">    input files.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">run_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;/&#39;</span> <span class="ow">in</span> <span class="n">run_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Error: A run ID must not contain a slash: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                           <span class="n">run_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span> <span class="o">=</span> <span class="n">fscache</span><span class="o">.</span><span class="n">FSCache</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A cache.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_step</span> <span class="o">=</span> <span class="n">step</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Step this run belongs to.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_id</span> <span class="o">=</span> <span class="n">run_id</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Identifier of this run.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">annotation_written</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Flag to mark if an annotation file was written during this uap execution.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_private_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">out_conns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="o">.</span><span class="n">get_out_connections</span><span class="p">(</span><span class="n">with_optional</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">out_connection</span> <span class="ow">in</span> <span class="n">out_conns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_out_connection</span><span class="p">(</span><span class="n">out_connection</span><span class="p">)</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Dictionary containing the output files for each outgoing connection and</span>
+<span class="sd">        their corresponding input files::</span>
+
+<span class="sd">           annotation_1:</span>
+<span class="sd">               out_path_1: [in_path_1, in_path_2, ...]</span>
+<span class="sd">               out_path_2: ...</span>
+<span class="sd">           annotation_2: ...</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ping_files</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;run&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;queued&#39;</span><span class="p">:</span> <span class="kc">None</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_submit_script</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exec_groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temp_paths</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        List of temporary paths which can be either files or paths</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temp_directory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Contains path to currently used temporary directory if set.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_known_paths</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">reset_fsc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">new_exec_group</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">eg</span> <span class="o">=</span> <span class="n">exec_group</span><span class="o">.</span><span class="n">ExecGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exec_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">eg</span>
+
+    <span class="k">def</span> <span class="nf">get_exec_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exec_groups</span>
+
+    <span class="k">def</span> <span class="nf">get_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span>
+
+    <span class="k">def</span> <span class="nf">set_run_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_id</span> <span class="o">=</span> <span class="n">run_id</span>
+
+    <span class="k">def</span> <span class="nf">get_run_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_id</span>
+
+    <span class="k">def</span> <span class="nf">get_out_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_out_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">connection</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;out/&quot;</span><span class="p">):</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="s1">&#39;out/&#39;</span> <span class="o">+</span> <span class="n">connection</span>
+        <span class="k">if</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_out_connections</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">connection</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Connection </span><span class="si">%s</span><span class="s2"> not declared for step </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">_get_ping_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ping_files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ping_files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_output_directory</span><span class="p">(),</span>
+                <span class="s1">&#39;.</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-ping.yaml&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">(),</span> <span class="n">key</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ping_files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_executing_ping_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ping_file</span><span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_queued_ping_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ping_file</span><span class="p">(</span><span class="s1">&#39;queued&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_submit_script_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_submit_script</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_submit_script</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_output_directory</span><span class="p">(),</span>
+                <span class="s2">&quot;.submit-</span><span class="si">%s</span><span class="s2">-</span><span class="si">%s</span><span class="s2">.sh&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_step_name</span><span class="p">(),</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">())</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_submit_script</span>
+
+    <span class="k">def</span> <span class="nf">is_source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">,</span> <span class="n">abst</span><span class="o">.</span><span class="n">AbstractSourceStep</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">get_known_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_known_paths</span>
+
+    <span class="k">def</span> <span class="nf">add_known_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">known_paths_dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_known_paths</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">known_paths_dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Run.get_temp_paths"><a class="viewcode-back" href="../api.html#run.Run.get_temp_paths">[docs]</a>    <span class="k">def</span> <span class="nf">get_temp_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a set of all temporary paths which belong to this run.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_paths</span></div>
+
+<div class="viewcode-block" id="Run.get_output_directory_du_jour_placeholder"><a class="viewcode-back" href="../api.html#run.Run.get_output_directory_du_jour_placeholder">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_directory_du_jour_placeholder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Used to return a placeholder for the temporary output directory, which</span>
+<span class="sd">        needed to be replaced by the actual temp directory inside the</span>
+<span class="sd">        abstract_step.execute() method.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Using run.get_output_directory_du_jour_placeholder() &quot;</span>
+                       <span class="s2">&quot;is deprecated. Just use the string &#39;.&#39; instead.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Run.get_temp_output_directory"><a class="viewcode-back" href="../api.html#run.Run.get_temp_output_directory">[docs]</a>    <span class="k">def</span> <span class="nf">get_temp_output_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the temporary output directory of a run.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">current_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y%m</span><span class="si">%d</span><span class="s1">-%H%M%S-</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_pipeline</span><span class="p">()</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;destination_path&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;temp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;temp-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_step_name</span><span class="p">(),</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">(),</span> <span class="n">current_time</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_temp_directory</span> <span class="o">=</span> <span class="n">path</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_directory</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_directory</span></div>
+
+<div class="viewcode-block" id="Run.get_run_structure"><a class="viewcode-back" href="../api.html#run.Run.get_run_structure">[docs]</a>    <span class="nd">@cache</span>
+    <span class="k">def</span> <span class="nf">get_run_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commands</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a dictionary with all information known at</span>
+<span class="sd">        run declaratuon time, relevant for its result</span>
+<span class="sd">        and nothing more.</span>
+
+<span class="sd">        Included are:</span>
+<span class="sd">         - tool versions</span>
+<span class="sd">         - commands and structure</span>
+<span class="sd">         - output connections and files</span>
+<span class="sd">         - parent run names and hashsum of their run_structure</span>
+
+<span class="sd">        Should not include:</span>
+<span class="sd">         - any absolute paths</span>
+<span class="sd">         - parent hashes of source steps (absolute paths)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">cmd_by_eg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">cmd_by_eg</span><span class="p">[</span><span class="s1">&#39;run_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_pipeline</span><span class="p">()</span>
+
+        <span class="c1"># get tool version texts and paths</span>
+        <span class="n">tools</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">_tools</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">cmd_by_eg</span><span class="p">[</span><span class="s1">&#39;tool_versions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">tool_conf</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">tool_conf</span><span class="p">[</span><span class="n">tool</span><span class="p">][</span><span class="s1">&#39;ignore_version&#39;</span><span class="p">]</span> \
+                    <span class="ow">and</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">no_tool_checks</span><span class="p">:</span>
+                <span class="n">tool_info</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">tool_versions</span><span class="p">[</span><span class="n">tool</span><span class="p">]</span>
+                <span class="n">real_tool_path</span> <span class="o">=</span> <span class="n">tool_info</span><span class="p">[</span><span class="s1">&#39;used_path&#39;</span><span class="p">]</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">tool_info</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">real_tool_path</span><span class="p">,</span> <span class="n">tool</span><span class="p">)</span>
+                <span class="n">cmd_by_eg</span><span class="p">[</span><span class="s1">&#39;tool_versions&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span>
+
+        <span class="c1"># get output files</span>
+        <span class="n">cmd_by_eg</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">connection</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_output_files</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">cmd_by_eg</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="n">connection</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">files</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># get parent hash</span>
+        <span class="n">cmd_by_eg</span><span class="p">[</span><span class="s1">&#39;parent hashes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">parents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parent_runs</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">prun</span> <span class="ow">in</span> <span class="n">parents</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prun</span><span class="o">.</span><span class="n">get_step</span><span class="p">(),</span> <span class="n">abst</span><span class="o">.</span><span class="n">AbstractSourceStep</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">task_id</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prun</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_step_name</span><span class="p">(),</span>
+                                 <span class="n">prun</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">())</span>
+            <span class="n">hashsum</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">str_to_sha256</span><span class="p">(</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                    <span class="n">prun</span><span class="o">.</span><span class="n">get_run_structure</span><span class="p">(),</span>
+                    <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+            <span class="n">cmd_by_eg</span><span class="p">[</span><span class="s1">&#39;parent hashes&#39;</span><span class="p">][</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">hashsum</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">commands</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cmd_by_eg</span>
+
+        <span class="c1"># get commands</span>
+        <span class="k">for</span> <span class="n">eg_count</span><span class="p">,</span> <span class="n">exec_g</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_exec_groups</span><span class="p">()):</span>
+            <span class="n">eg_name</span> <span class="o">=</span> <span class="s1">&#39;execution group </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">eg_count</span>
+            <span class="n">cmd_by_eg</span><span class="p">[</span><span class="n">eg_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">procs</span> <span class="o">=</span> <span class="n">exec_g</span><span class="o">.</span><span class="n">get_pipes_and_commands</span><span class="p">(</span><span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">pipe_count</span><span class="p">,</span> <span class="n">poc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">procs</span><span class="p">):</span>
+                <span class="c1"># for each pipe or command (poc)</span>
+                <span class="c1"># check if it is a pipeline ...</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">poc</span><span class="p">,</span> <span class="n">pipeline_info</span><span class="o">.</span><span class="n">PipelineInfo</span><span class="p">):</span>
+                    <span class="n">cmd_by_eg</span><span class="p">[</span><span class="n">eg_name</span><span class="p">][</span><span class="s1">&#39;pipe </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pipe_count</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">poc</span><span class="o">.</span><span class="n">get_command_string</span><span class="p">(</span><span class="n">replace_path</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1"># ... or a command</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">poc</span><span class="p">,</span> <span class="n">command_info</span><span class="o">.</span><span class="n">CommandInfo</span><span class="p">):</span>
+                    <span class="n">cmd_by_eg</span><span class="p">[</span><span class="n">eg_name</span><span class="p">][</span><span class="s1">&#39;command </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pipe_count</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">poc</span><span class="o">.</span><span class="n">get_command_string</span><span class="p">(</span><span class="n">replace_path</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cmd_by_eg</span></div>
+
+    <span class="k">def</span> <span class="nf">get_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">anno_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">written_anno_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">anno_data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;Error&#39;</span><span class="p">:</span> <span class="s1">&#39;Missing annotation file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_annotation_path</span><span class="p">()}</span>
+        <span class="n">old_struct</span> <span class="o">=</span> <span class="n">anno_data</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;structure&#39;</span><span class="p">]</span>
+        <span class="n">new_struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_structure</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">DeepDiff</span><span class="p">(</span><span class="n">old_struct</span><span class="p">,</span> <span class="n">new_struct</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Run.dependencies"><a class="viewcode-back" href="../api.html#run.Run.dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dict with a set of input files for each output file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">connections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_files_abspath</span><span class="p">()</span>
+        <span class="n">dependencies</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">deps</span> <span class="ow">in</span> <span class="n">connections</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">out_file</span><span class="p">,</span> <span class="n">input_files</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">input_files</span> <span class="ow">or</span> <span class="n">input_files</span> <span class="o">==</span> <span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="n">dependencies</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+                <span class="n">dependencies</span><span class="p">[</span><span class="n">out_file</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">input_files</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">dependencies</span></div>
+
+    <span class="k">def</span> <span class="nf">file_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_hash</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">report_correct</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">anno_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">written_anno_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">anno_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="n">new_dest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_pipeline</span><span class="p">()</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;destination_path&#39;</span><span class="p">]</span>
+        <span class="n">old_dest</span> <span class="o">=</span> <span class="n">anno_data</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;destination_path&#39;</span><span class="p">]</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_pipeline</span><span class="p">()</span>
+        <span class="n">is_volatile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">is_volatile</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">input_files</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+            <span class="c1"># is it logged in the annotation file</span>
+            <span class="n">old_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">new_dest</span><span class="p">,</span> <span class="n">old_dest</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">old_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">anno_data</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;known_paths&#39;</span><span class="p">]:</span>
+                <span class="k">yield</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> not logged in the annotation file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
+                      <span class="p">(</span><span class="n">old_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_annotation_path</span><span class="p">()))</span>
+                <span class="k">continue</span>
+            <span class="n">meta_data</span> <span class="o">=</span> <span class="n">anno_data</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;known_paths&#39;</span><span class="p">][</span><span class="n">old_path</span><span class="p">]</span>
+
+            <span class="c1"># existence and volatility</span>
+            <span class="n">v_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="n">abst</span><span class="o">.</span><span class="n">AbstractStep</span><span class="o">.</span><span class="n">VOLATILE_SUFFIX</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_volatile</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">v_path</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is missing&#39;</span> <span class="o">%</span> <span class="n">path</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">is_volatile</span><span class="p">:</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">v_path</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># is marked volatile but not volatilized yet</span>
+                    <span class="n">is_volatile</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># modification time</span>
+            <span class="n">change_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">new_mtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="n">old_mtime</span> <span class="o">=</span> <span class="n">meta_data</span><span class="p">[</span><span class="s1">&#39;modification time&#39;</span><span class="p">]</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">new_mtime</span> <span class="o">-</span> <span class="n">old_mtime</span>
+            <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">change_str</span> <span class="o">=</span> <span class="s1">&#39; and modification date after </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">old_mtime</span>
+
+            <span class="c1"># chaged dependencies</span>
+            <span class="n">has_changed_deps</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">in_file</span> <span class="ow">in</span> <span class="n">input_files</span><span class="p">:</span>
+                <span class="n">parent_task</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">get_task_for_file</span><span class="p">(</span><span class="n">in_file</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">parent_task</span><span class="p">:</span>
+                    <span class="n">parent_volitile</span> <span class="o">=</span> <span class="n">parent_task</span><span class="o">.</span><span class="n">step</span><span class="o">.</span><span class="n">is_volatile</span><span class="p">()</span>
+                    <span class="n">parent_fsc</span> <span class="o">=</span> <span class="n">parent_task</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">fsc</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># the parent was probably a source step</span>
+                    <span class="n">parent_volitile</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">parent_fsc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span>
+                <span class="n">v_in</span> <span class="o">=</span> <span class="n">in_file</span> <span class="o">+</span> <span class="n">abst</span><span class="o">.</span><span class="n">AbstractStep</span><span class="o">.</span><span class="n">VOLATILE_SUFFIX</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">parent_fsc</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">in_file</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">parent_volitile</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">parent_fsc</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">v_in</span><span class="p">):</span>
+                        <span class="n">has_changed_deps</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">yield</span> <span class="s1">&#39;input file </span><span class="si">%s</span><span class="s1"> is missing&#39;</span> <span class="o">%</span> <span class="n">in_file</span>
+                        <span class="k">continue</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">in_file</span> <span class="o">=</span> <span class="n">v_in</span>
+                <span class="k">if</span> <span class="n">parent_fsc</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">in_file</span><span class="p">)</span> <span class="o">&gt;</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="n">has_changed_deps</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">yield</span> <span class="s1">&#39;input file </span><span class="si">%s</span><span class="s1"> was modified&#39;</span> <span class="o">%</span> <span class="n">in_file</span>
+            <span class="k">if</span> <span class="n">has_changed_deps</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">change_str</span><span class="p">:</span>
+                    <span class="n">change_str</span> <span class="o">=</span> <span class="s1">&#39;, has changed input&#39;</span> <span class="o">+</span> <span class="n">change_str</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">change_str</span> <span class="o">=</span> <span class="s1">&#39; and has changed input&#39;</span>
+
+            <span class="c1"># stop here if volatile</span>
+            <span class="k">if</span> <span class="n">is_volatile</span> <span class="ow">and</span> <span class="n">change_str</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39; is volatilized&#39;</span> <span class="o">+</span> <span class="n">change_str</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">is_volatile</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># size changes</span>
+            <span class="n">old_size</span> <span class="o">=</span> <span class="n">meta_data</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span>
+            <span class="n">new_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new_size</span> <span class="o">!=</span> <span class="n">old_size</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> size changed from </span><span class="si">%s</span><span class="s1"> B to </span><span class="si">%s</span><span class="s1"> B</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
+                      <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">old_size</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">change_str</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># hash sum</span>
+            <span class="k">if</span> <span class="n">do_hash</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">old_hash</span> <span class="o">=</span> <span class="n">meta_data</span><span class="p">[</span><span class="s1">&#39;sha256&#39;</span><span class="p">]</span>
+                <span class="n">new_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">sha256sum_of</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">new_hash</span> <span class="o">!=</span> <span class="n">old_hash</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> sha256sum changed from </span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
+                          <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">old_hash</span><span class="p">,</span> <span class="n">new_hash</span><span class="p">,</span> <span class="n">change_str</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">change_str</span> <span class="ow">or</span> <span class="n">report_correct</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> sha256sum is correct</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
+                          <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">change_str</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+            <span class="c1"># what changed</span>
+            <span class="k">elif</span> <span class="n">change_str</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">change_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39; and&#39;</span><span class="p">):</span>
+                    <span class="n">change_str</span> <span class="o">=</span> <span class="n">change_str</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39; and&#39;</span><span class="p">):]</span>
+                <span class="k">elif</span> <span class="n">change_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39; ,&#39;</span><span class="p">):</span>
+                    <span class="n">change_str</span> <span class="o">=</span> <span class="n">change_str</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39; ,&#39;</span><span class="p">):]</span>
+                <span class="k">yield</span> <span class="n">path</span> <span class="o">+</span> <span class="n">change_str</span>
+
+    <span class="nd">@cache</span>
+    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_hash</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_pipeline</span><span class="p">()</span><span class="o">.</span><span class="n">states</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">(),</span> <span class="n">abst</span><span class="o">.</span><span class="n">AbstractSourceStep</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">FINISHED</span>
+        <span class="n">ex_ping_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_executing_ping_file</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ex_ping_file</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Found execution ping file: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ex_ping_file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stale</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">BAD</span>
+            <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">EXECUTING</span>
+        <span class="n">qu_ping_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_queued_ping_file</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">qu_ping_file</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Found queue ping file: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">qu_ping_file</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">QUEUED</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_queued_ping_file</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;.bad&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">BAD</span>
+
+        <span class="n">anno_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">written_anno_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">anno_data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">anno_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">BAD</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_changes</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">CHANGED</span>
+
+        <span class="n">has_volitile_parent</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parent_runs</span><span class="p">():</span>
+            <span class="n">pstate</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">do_hash</span><span class="o">=</span><span class="n">do_hash</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pstate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">states</span><span class="o">.</span><span class="n">FINISHED</span><span class="p">,</span> <span class="n">states</span><span class="o">.</span><span class="n">VOLATILIZED</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">WAITING</span>
+            <span class="k">if</span> <span class="n">pstate</span> <span class="o">==</span> <span class="n">states</span><span class="o">.</span><span class="n">VOLATILIZED</span><span class="p">:</span>
+                <span class="n">has_volitile_parent</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">output_files</span> <span class="o">=</span> <span class="p">[(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">input_files</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">files</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_files_abspath</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                        <span class="k">for</span> <span class="n">out_file</span><span class="p">,</span> <span class="n">input_files</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="n">all_exist</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">out_file</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">output_files</span><span class="p">)</span>
+        <span class="n">is_volatilized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">all_exist</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">is_volatile</span><span class="p">():</span>
+            <span class="n">all_exist</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
+                    <span class="n">out_file</span> <span class="o">+</span>
+                    <span class="n">abst</span><span class="o">.</span><span class="n">AbstractStep</span><span class="o">.</span><span class="n">VOLATILE_SUFFIX</span><span class="p">)</span> <span class="k">for</span> <span class="n">out_file</span><span class="p">,</span>
+                <span class="n">_</span> <span class="ow">in</span> <span class="n">output_files</span><span class="p">)</span>
+            <span class="n">is_volatilized</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">all_exist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">has_volitile_parent</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">WAITING</span>
+            <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">READY</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">anno_data</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">CHANGED</span>
+            <span class="k">for</span> <span class="n">bad_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_changes</span><span class="p">(</span><span class="n">do_hash</span><span class="o">=</span><span class="n">do_hash</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">bad_file</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">CHANGED</span>
+            <span class="k">if</span> <span class="n">is_volatilized</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">VOLATILIZED</span>
+            <span class="k">return</span> <span class="n">states</span><span class="o">.</span><span class="n">FINISHED</span>
+
+<div class="viewcode-block" id="Run.get_parent_runs"><a class="viewcode-back" href="../api.html#run.Run.get_parent_runs">[docs]</a>    <span class="k">def</span> <span class="nf">get_parent_runs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the parent runs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_pipeline</span><span class="p">()</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">())</span>
+        <span class="n">input_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">input_files_for_task_id</span><span class="p">:</span>
+            <span class="n">input_files</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">input_files_for_task_id</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
+        <span class="n">parents</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="c1"># Only source steps do have empty strings in the input files list</span>
+        <span class="c1"># so we can safely exclude them here</span>
+        <span class="k">for</span> <span class="n">inpath</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">input_files</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]:</span>
+            <span class="n">task_id</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">task_id_for_output_file</span><span class="p">[</span><span class="n">inpath</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">task_for_task_id</span><span class="p">:</span>
+                <span class="n">parents</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">task_for_task_id</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span><span class="o">.</span><span class="n">get_run</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">parents</span></div>
+
+<div class="viewcode-block" id="Run.get_output_directory"><a class="viewcode-back" href="../api.html#run.Run.get_output_directory">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the final output directory.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_output_directory</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Run.add_private_info"><a class="viewcode-back" href="../api.html#run.Run.add_private_info">[docs]</a>    <span class="k">def</span> <span class="nf">add_private_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add private information to a run. Use this to store data which you will</span>
+<span class="sd">        need when the run is executed. As opposed to public information,</span>
+<span class="sd">        private information is not visible to subsequent steps.</span>
+
+<span class="sd">        You can store paths to input files here, but not paths to output files as</span>
+<span class="sd">        their expected location is not defined until we&#39;re in</span>
+<span class="sd">        *AbstractStep.execute*</span>
+<span class="sd">        (hint: they get written to a temporary directory inside *execute()*).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_private_info</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_private_info</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s2">&quot;You&#39;re trying to overwrite private info </span><span class="si">%s</span><span class="s2"> with </span><span class="si">%s</span><span class="s2">, &quot;</span>
+                <span class="s2">&quot;but there&#39;s already a different value stored: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_private_info</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_private_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="Run.add_public_info"><a class="viewcode-back" href="../api.html#run.Run.add_public_info">[docs]</a>    <span class="k">def</span> <span class="nf">add_public_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add public information to a run. For example, a FASTQ reader may store</span>
+<span class="sd">        the index barcode here for subsequent steps to query via</span>
+<span class="sd">        ``AbstractStep.find_upstream_info()``.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s2">&quot;You&#39;re trying to overwrite public info </span><span class="si">%s</span><span class="s2"> with </span><span class="si">%s</span><span class="s2">, &quot;</span>
+                <span class="s2">&quot;but there&#39;s already a different value stored: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="Run.update_public_info"><a class="viewcode-back" href="../api.html#run.Run.update_public_info">[docs]</a>    <span class="k">def</span> <span class="nf">update_public_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Update public information already existing in a run. For example, all</span>
+<span class="sd">        steps which handle FASTQ files want to know how to distinguish between</span>
+<span class="sd">        files of read 1 and files of read 2. So each step that provides FASTQ</span>
+<span class="sd">        should update this information if the file names are altered.</span>
+<span class="sd">        The stored information can be acquired via:</span>
+<span class="sd">        ``AbstractStep.find_upstream_info()``.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;The key </span><span class="si">%s</span><span class="s2"> doesn&#39;t exist yet as public info.&quot;</span>
+                           <span class="s2">&quot;Please use add_public_info(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span>
+                           <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="Run.add_output_file"><a class="viewcode-back" href="../api.html#run.Run.add_output_file">[docs]</a>    <span class="k">def</span> <span class="nf">add_output_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">out_path</span><span class="p">,</span> <span class="n">in_paths</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add an output file to this run. Output file names must be unique across</span>
+<span class="sd">        all runs defined by a step, so it may be a good idea to include the</span>
+<span class="sd">        run_id into the output filename.</span>
+
+<span class="sd">          - *tag*: You must specify the connection annotation which must have been</span>
+<span class="sd">                  previously declared via *AbstractStep.add_connection(&quot;out/...&quot;)*,</span>
+<span class="sd">                  but this doesn&#39;t have to be done in the step constructor, it&#39;s</span>
+<span class="sd">                  also possible in *declare_runs()* right before this method is</span>
+<span class="sd">                  called.</span>
+<span class="sd">          - *out_path*: The output file path, without a directory. The pipeline</span>
+<span class="sd">                       assigns directories for you (this parameter must not</span>
+<span class="sd">                       contain a slash).</span>
+<span class="sd">          - *in_paths*: A list of input files this output file depends on. It is</span>
+<span class="sd">                       **crucial** to get this right, so that the pipeline can</span>
+<span class="sd">                       determine which steps are up-to-date at any given time.</span>
+<span class="sd">                       You have to specify absolute paths here, including a</span>
+<span class="sd">                       directory, and you can obtain them via</span>
+<span class="sd">                       *AbstractStep.run_ids_and_input_files_for_connection*</span>
+<span class="sd">                       and related functions.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">head</span><span class="p">,</span> <span class="n">tail</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
+
+        <span class="c1"># make sure there&#39;s no slash in out_path unless it&#39;s a source step</span>
+        <span class="k">if</span> <span class="n">head</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="ow">not</span> \
+           <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">,</span> <span class="n">abst</span><span class="o">.</span><span class="n">AbstractSourceStep</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;The declared output file path contains &quot;</span>
+                           <span class="s2">&quot;directory separator: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">out_path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">,</span> <span class="n">abst</span><span class="o">.</span><span class="n">AbstractSourceStep</span><span class="p">):</span>
+            <span class="n">out_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
+        <span class="c1"># make sure tag was declared with an outgoing connection</span>
+        <span class="k">if</span> <span class="s1">&#39;out/&#39;</span> <span class="o">+</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_out_connection</span><span class="p">(</span><span class="s1">&#39;out/&#39;</span> <span class="o">+</span> <span class="n">tag</span><span class="p">)</span>
+
+        <span class="n">out_connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_out_connection</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">out_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_files_for_out_connection</span><span class="p">(</span>
+                <span class="n">out_connection</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s2">&quot;You&#39;re trying to re-add an output file which has already &quot;</span>
+                <span class="s2">&quot;been declared: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">out_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_paths</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Input paths (</span><span class="si">%s</span><span class="s2">) is not a list.&quot;</span> <span class="o">%</span> <span class="n">in_paths</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">in_paths</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s2">&quot;There is a NoneType element in input paths (</span><span class="si">%s</span><span class="s2">) for output &quot;</span>
+                <span class="s2">&quot;file (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_paths</span><span class="p">,</span> <span class="n">out_path</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">out_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s2">&quot;Trying to add NoneType element as output file for input paths &quot;</span>
+                <span class="s2">&quot;: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                <span class="n">in_paths</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_files</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">in_paths</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Adding files </span><span class="si">%s</span><span class="s1"> as for connection </span><span class="si">%s</span><span class="s1"> in </span><span class="si">%s</span><span class="s1"> for run </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">out_path</span><span class="p">,</span> <span class="n">out_connection</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="p">[</span><span class="n">out_connection</span><span class="p">][</span><span class="n">out_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_paths</span>
+        <span class="k">return</span> <span class="n">out_path</span></div>
+
+<div class="viewcode-block" id="Run.add_temporary_file"><a class="viewcode-back" href="../api.html#run.Run.add_temporary_file">[docs]</a>    <span class="k">def</span> <span class="nf">add_temporary_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">designation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the name of a temporary file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_paths</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">temp_name</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="o">+</span> <span class="n">suffix</span>
+            <span class="k">if</span> <span class="n">temp_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_paths</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Temporary file (#</span><span class="si">%s</span><span class="s2">) in run </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_paths</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">(),</span> <span class="n">temp_name</span><span class="p">))</span>
+
+        <span class="c1"># _known_paths dict is logged</span>
+        <span class="n">known_paths</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">known_paths</span><span class="p">[</span><span class="n">temp_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">temp_name</span><span class="p">),</span>
+            <span class="s1">&#39;designation&#39;</span><span class="p">:</span> <span class="n">designation</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_known_paths</span><span class="p">(</span><span class="n">known_paths</span><span class="p">)</span>
+        <span class="c1"># _temp_paths set contains all temporary files which are going to be</span>
+        <span class="c1"># deleted</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temp_paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">temp_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">temp_name</span></div>
+
+<div class="viewcode-block" id="Run.add_temporary_directory"><a class="viewcode-back" href="../api.html#run.Run.add_temporary_directory">[docs]</a>    <span class="k">def</span> <span class="nf">add_temporary_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                <span class="n">designation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Convenience method for creation of temporary directories.</span>
+<span class="sd">        Basically, just calls self.add_temporary_file().</span>
+<span class="sd">        The magic happens in ProcessPool.__exit__()</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_temporary_file</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
+                                       <span class="n">designation</span><span class="o">=</span><span class="n">designation</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Run.remove_temporary_paths"><a class="viewcode-back" href="../api.html#run.Run.remove_temporary_paths">[docs]</a>    <span class="k">def</span> <span class="nf">remove_temporary_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Everything stored in self._temp_paths is examined and deleted if</span>
+<span class="sd">        possible. The list elements are removed in LIFO order.</span>
+<span class="sd">        Also, self._known_paths &#39;type&#39; info is updated here.</span>
+<span class="sd">        NOTE: Included additional stat checks to detect FIFOs as well as other</span>
+<span class="sd">        special files.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">tmp_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_paths</span><span class="p">:</span>
+            <span class="c1"># Check file type</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Set </span><span class="si">%s</span><span class="s2"> &#39;type&#39; info to &#39;missing&#39;&quot;</span> <span class="o">%</span> <span class="n">tmp_file</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_known_paths</span><span class="p">[</span><span class="n">tmp_file</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;missing&#39;</span>
+                <span class="k">continue</span>
+            <span class="n">pathmode</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span><span class="o">.</span><span class="n">st_mode</span>
+            <span class="n">isdir</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_ISDIR</span><span class="p">(</span><span class="n">pathmode</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+            <span class="n">isfile</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_ISREG</span><span class="p">(</span><span class="n">pathmode</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+            <span class="n">isfifo</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_ISFIFO</span><span class="p">(</span><span class="n">pathmode</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+            <span class="c1"># Update &#39;type&#39; value</span>
+            <span class="k">if</span> <span class="n">tmp_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_known_paths</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">isfile</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Set </span><span class="si">%s</span><span class="s2"> &#39;type&#39; info to &#39;file&#39;&quot;</span> <span class="o">%</span> <span class="n">tmp_file</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_known_paths</span><span class="p">[</span><span class="n">tmp_file</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;file&#39;</span>
+                <span class="k">elif</span> <span class="n">isdir</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s2">&quot;Set </span><span class="si">%s</span><span class="s2"> &#39;type&#39; info to &#39;directory&#39;&quot;</span> <span class="o">%</span>
+                        <span class="n">tmp_file</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_known_paths</span><span class="p">[</span><span class="n">tmp_file</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;directory&#39;</span>
+                <span class="k">elif</span> <span class="n">isfifo</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Set </span><span class="si">%s</span><span class="s2"> &#39;type&#39; info to &#39;fifo&#39;&quot;</span> <span class="o">%</span> <span class="n">tmp_file</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_known_paths</span><span class="p">[</span><span class="n">tmp_file</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;fifo&#39;</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isdir</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Now deleting directory: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">tmp_file</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;errno: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;strerror: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">strerror</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;filename: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+                    <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Now deleting: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">tmp_file</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Run.add_empty_output_connection"><a class="viewcode-back" href="../api.html#run.Run.add_empty_output_connection">[docs]</a>    <span class="k">def</span> <span class="nf">add_empty_output_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        An empty output connection has &#39;None&#39; as output file and &#39;None&#39; as input</span>
+<span class="sd">        file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s1">&#39;[Deprecation] </span><span class="si">%s</span><span class="s1">: add_empty_output_connection is depricated. &#39;</span>
+            <span class="s1">&#39;Please make the connection &quot;out/</span><span class="si">%s</span><span class="s1">&quot; optional and do not add &#39;</span>
+            <span class="s1">&#39;anything instead.&#39;</span> <span class="o">%</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">(),</span> <span class="n">tag</span><span class="p">))</span>
+        <span class="c1"># make sure tag was declared with an outgoing connection</span>
+        <span class="k">if</span> <span class="s1">&#39;out/&#39;</span> <span class="o">+</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="o">.</span><span class="n">get_out_connections</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid output_file tag &#39;</span><span class="si">%s</span><span class="s2">&#39; in </span><span class="si">%s</span><span class="s2">. &quot;</span>
+                <span class="s2">&quot;You might want to add self.add_connection(&#39;out/</span><span class="si">%s</span><span class="s2">&#39;) &quot;</span>
+                <span class="s2">&quot;to the constructor of </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">),</span> <span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="o">.</span><span class="vm">__module__</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out_connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_out_connection</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">out_connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_out_connection</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="p">[</span><span class="n">out_connection</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s2">&quot;You&#39;re trying to re-declare </span><span class="si">%s</span><span class="s2"> as an empty output connection &quot;</span>
+                <span class="o">%</span> <span class="n">out_connection</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="p">[</span><span class="n">out_connection</span><span class="p">][</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">add_out_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_connection</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">out_connection</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;out/&#39;</span><span class="p">):</span>
+            <span class="n">out_connection</span> <span class="o">=</span> <span class="s1">&#39;out/&#39;</span> <span class="o">+</span> <span class="n">out_connection</span>
+        <span class="k">if</span> <span class="n">out_connection</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="o">.</span><span class="n">get_out_connections</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Invalid output connection &#39;</span><span class="si">%s</span><span class="s2">&#39; in </span><span class="si">%s</span><span class="s2">. &quot;</span>
+                           <span class="s2">&quot;You might want to add self.add_connection(&#39;</span><span class="si">%s</span><span class="s2">&#39;) &quot;</span>
+                           <span class="s2">&quot;to the constructor of </span><span class="si">%s</span><span class="s2">.&quot;</span>
+                           <span class="o">%</span> <span class="p">(</span><span class="n">out_connection</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">),</span> <span class="n">out_connection</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="o">.</span><span class="vm">__module__</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Adding </span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1"> in run </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">out_connection</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="p">[</span><span class="n">out_connection</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out_connection</span>
+
+    <span class="k">def</span> <span class="nf">get_input_files_for_output_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_out_connections</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">output_file</span> <span class="ow">in</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_output_files_for_out_connection</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="p">[</span><span class="n">connection</span><span class="p">][</span><span class="n">output_file</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Sorry, your output &#39;</span><span class="si">%s</span><span class="s2">&#39; file couldn&#39;t be found&quot;</span> <span class="o">%</span>
+                       <span class="n">output_file</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_input_files_for_output_file_abspath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_out_connections</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">output_file</span> <span class="ow">in</span> \
+               <span class="bp">self</span><span class="o">.</span><span class="n">get_output_files_abspath_for_out_connection</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_files_abspath</span><span class="p">()[</span><span class="n">connection</span><span class="p">][</span><span class="n">output_file</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_output_files_for_out_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_connection</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="p">[</span><span class="n">out_connection</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">get_output_files_abspath_for_out_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_connection</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_output_files_abspath</span><span class="p">()[</span><span class="n">out_connection</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_output_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span>
+
+<div class="viewcode-block" id="Run.get_output_files_abspath"><a class="viewcode-back" href="../api.html#run.Run.get_output_files_abspath">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_files_abspath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return a dictionary of all defined output files, grouped by connection</span>
+<span class="sd">        annotation::</span>
+
+<span class="sd">           annotation_1:</span>
+<span class="sd">               out_path_1: [in_path_1, in_path_2, ...]</span>
+<span class="sd">               out_path_2: ...</span>
+<span class="sd">           annotation_2: ...</span>
+
+<span class="sd">        The ``out_path`` consists of the output directory du jour and the output</span>
+<span class="sd">        file name.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">connection</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">out_path</span><span class="p">,</span> <span class="n">in_paths</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="p">[</span><span class="n">connection</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_directory</span><span class="p">()</span>
+                <span class="n">full_path</span> <span class="o">=</span> <span class="n">out_path</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">directory</span> <span class="ow">and</span> <span class="n">out_path</span> <span class="ow">and</span> <span class="n">directory</span> <span class="o">!=</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+                        <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">out_path</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">connection</span><span class="p">][</span><span class="n">full_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_paths</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="Run.get_output_files_for_annotation_and_tags"><a class="viewcode-back" href="../api.html#run.Run.get_output_files_for_annotation_and_tags">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_files_for_annotation_and_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve a set of output files of the given annotation, assigned to</span>
+<span class="sd">        the same number of specified tags. If you have two &#39;alignment&#39; output</span>
+<span class="sd">        files and they are called *out-a.txt* and *out-b.txt*, you can use this</span>
+<span class="sd">        function like this:</span>
+
+<span class="sd">        - *tags*: [&#39;a&#39;, &#39;b&#39;]</span>
+<span class="sd">        - result: {&#39;a&#39;: &#39;out-a.txt&#39;, &#39;b&#39;: &#39;out-b.txt&#39;}</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_files_abspath</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">misc</span><span class="o">.</span><span class="n">assign_strings</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="n">annotation</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">tags</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Run.get_public_info"><a class="viewcode-back" href="../api.html#run.Run.get_public_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_public_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Query public information which must have been previously stored via &quot;</span>
+<span class="sd">        &quot;*add_public_info()*.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Run.has_public_info"><a class="viewcode-back" href="../api.html#run.Run.has_public_info">[docs]</a>    <span class="k">def</span> <span class="nf">has_public_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Query whether a piece of public information has been defined.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Run.get_private_info"><a class="viewcode-back" href="../api.html#run.Run.get_private_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_private_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Query private information which must have been previously stored via &quot;</span>
+<span class="sd">        &quot;*add_private_info()*.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_private_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Run.has_private_info"><a class="viewcode-back" href="../api.html#run.Run.has_private_info">[docs]</a>    <span class="k">def</span> <span class="nf">has_private_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Query whether a piece of public information has been defined.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_private_info</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commands</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([</span>
+            <span class="p">(</span><span class="s1">&#39;step_type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()),</span>
+            <span class="p">(</span><span class="s1">&#39;step_name&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_step_name</span><span class="p">()),</span>
+            <span class="p">(</span><span class="s1">&#39;run_id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_id</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;output_directory&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_directory</span><span class="p">()),</span>
+            <span class="p">(</span><span class="s1">&#39;annotation_file&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_annotation_path</span><span class="p">()),</span>
+            <span class="p">(</span><span class="s1">&#39;output_files&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_files</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;private_info&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_private_info</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;public_info&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span><span class="p">)</span>
+        <span class="p">])</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_run_structure</span><span class="p">(</span><span class="n">commands</span><span class="o">=</span><span class="n">commands</span><span class="p">))</span>
+        <span class="k">del</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;tool_versions&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span>
+        <span class="n">anno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">written_anno_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">anno</span> <span class="ow">and</span> <span class="n">anno</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;run annotation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([</span>
+                <span class="p">(</span><span class="s1">&#39;start_time&#39;</span><span class="p">,</span> <span class="n">anno</span><span class="p">[</span><span class="s1">&#39;start_time&#39;</span><span class="p">]),</span>
+                <span class="p">(</span><span class="s1">&#39;end_time&#39;</span><span class="p">,</span> <span class="n">anno</span><span class="p">[</span><span class="s1">&#39;end_time&#39;</span><span class="p">])</span>
+            <span class="p">])</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">anno</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;known_paths&#39;</span><span class="p">,</span> <span class="s1">&#39;structure&#39;</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;run annotation&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;run annotation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;no completed run yet&#39;</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_queued_ping_file</span><span class="p">(),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">buff</span><span class="p">:</span>
+                <span class="n">current</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_executing_ping_file</span><span class="p">(),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">buff</span><span class="p">:</span>
+                <span class="n">current</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">current</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;run current&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;run current&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;not currently running&#39;</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="nd">@cache</span>
+    <span class="k">def</span> <span class="nf">written_anno_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">anno_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_annotation_path</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">anno_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fl</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fl</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">anno_file</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;The annotation file &quot;</span><span class="si">%s</span><span class="s1">&quot; could not be read.&#39;</span>
+                               <span class="o">%</span> <span class="n">anno_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Run.write_annotation_file"><a class="viewcode-back" href="../api.html#run.Run.write_annotation_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_annotation_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">job_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Write the YAML annotation after a successful or failed run. The</span>
+<span class="sd">        annotation can later be used to render the process graph.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_directory</span><span class="p">()</span>
+
+        <span class="c1"># now write the annotation</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">][</span><span class="s1">&#39;options&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_options</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_step_name</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span>
+        <span class="c1"># if a submit script was used ...</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_submit_script_file</span><span class="p">()</span>
+        <span class="n">script_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">script</span><span class="p">):</span>
+            <span class="n">log</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">][</span><span class="s1">&#39;submit_script&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">script_path</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">][</span><span class="s1">&#39;cores&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_cores</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;run_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;output_directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_directory</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;private_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_private_info</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;public_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_info</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;temp_directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_temp_output_directory</span><span class="p">()</span>
+        <span class="c1"># if a run submit script was used ...</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_submit_script_file</span><span class="p">()):</span>
+            <span class="c1"># ... read it and store it ...</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_submit_script_file</span><span class="p">(),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;submit_script&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="c1"># ... finally delete it</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_submit_script_file</span><span class="p">())</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;known_paths&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_known_paths</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;structure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_structure</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;hostname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">node</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;platform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pwd</span><span class="o">.</span><span class="n">getpwuid</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getuid</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">error</span>
+        <span class="k">if</span> <span class="n">job_id</span><span class="p">:</span>
+            <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;cluster job id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">job_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_queued_ping_file</span><span class="p">(),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">buff</span><span class="p">:</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+                <span class="n">log</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;cluster job id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;cluster job id&#39;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                <span class="k">pass</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_pipeline</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">config</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">no_tool_checks</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Writing annotation file without tool checks.&#39;</span><span class="p">)</span>
+            <span class="n">log</span><span class="p">[</span><span class="s1">&#39;tool_versions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;deactivated with --no-tool-checks&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="p">[</span><span class="s1">&#39;tool_versions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">_tools</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">log</span><span class="p">[</span><span class="s1">&#39;tool_versions&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">tool_versions</span><span class="p">[</span><span class="n">tool</span><span class="p">]</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;pipeline_log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">_pipeline_log</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">start_time</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">end_time</span>
+
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;uap_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">uap_version</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;git_tag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">git_tag</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;git_status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">git_status</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;git_diff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">git_diff</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;git_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">git_version</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">caught_signal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log</span><span class="p">[</span><span class="s1">&#39;signal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">caught_signal</span>
+
+        <span class="n">annotation_yaml</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">log</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                    <span class="n">Dumper</span><span class="o">=</span><span class="n">misc</span><span class="o">.</span><span class="n">UAPDumper</span><span class="p">)</span>
+        <span class="n">annotation_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_annotation_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="c1"># overwrite the annotation if it already exists</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">annotation_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">annotation_yaml</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">annotation_written</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">annotation_path</span></div>
+
+    <span class="k">def</span> <span class="nf">get_annotation_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_directory</span><span class="p">()</span>
+        <span class="n">annotation_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">-annotation.yaml&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run_id</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">annotation_path</span>
+
+<div class="viewcode-block" id="Run.is_stale"><a class="viewcode-back" href="../api.html#run.Run.is_stale">[docs]</a>    <span class="k">def</span> <span class="nf">is_stale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exec_ping_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns time of inactivity if the ping file exists and is stale.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">exec_ping_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">exec_ping_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_executing_ping_file</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">exec_ping_file</span><span class="p">):</span>
+            <span class="n">last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">exec_ping_file</span><span class="p">))</span>
+            <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">inactivity</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">last_activity</span>
+            <span class="k">if</span> <span class="n">inactivity</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">&gt;</span> \
+                    <span class="n">abst</span><span class="o">.</span><span class="n">AbstractStep</span><span class="o">.</span><span class="n">PING_TIMEOUT</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">inactivity</span>
+        <span class="k">return</span> <span class="kc">False</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christoph Kämpf, Michael Specht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

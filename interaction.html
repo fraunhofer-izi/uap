@@ -1,0 +1,717 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Command-Line Usage of uap &mdash; uap 2.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Add New Functionality" href="extension.html" />
+    <link rel="prev" title="Analysis Configuration File" href="configuration.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> uap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introducing <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#software-design">Software Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#recommended-uap-workflow">Recommended <strong>uap</strong> Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to.html">Quick Start <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Analysis Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html#cluster-configuration-file">Cluster Configuration File</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command-Line Usage of <strong>uap</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subcommands">Subcommands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#steps-subcommand"><code class="docutils literal notranslate"><span class="pre">steps</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#status-subcommand"><code class="docutils literal notranslate"><span class="pre">status</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-info-subcommand"><code class="docutils literal notranslate"><span class="pre">run-info</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-locally-subcommand"><code class="docutils literal notranslate"><span class="pre">run-locally</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submit-to-cluster-subcommand"><code class="docutils literal notranslate"><span class="pre">submit-to-cluster</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fix-problems-subcommand"><code class="docutils literal notranslate"><span class="pre">fix-problems</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#volatilize-subcommand"><code class="docutils literal notranslate"><span class="pre">volatilize</span></code> Subcommand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#render-subcommand"><code class="docutils literal notranslate"><span class="pre">render</span></code> Subcommand</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="extension.html">Add New Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Tested Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annotation.html">Annotation Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="steps.html">Available steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Information for uap Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">uap</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Command-Line Usage of uap</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/interaction.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="command-line-usage-of-uap">
+<span id="cli-usage-uap"></span><h1>Command-Line Usage of <strong>uap</strong><a class="headerlink" href="#command-line-usage-of-uap" title="Permalink to this headline">¶</a></h1>
+<p><strong>uap</strong> uses Python’s <a href="https://docs.python.org/2.7/library/argparse.html" target="_blank">argparse</a>.
+Therefore, <strong>uap</strong> provides help information on the command-line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap -h
+usage: uap [-h] [-v] [--path] [--debugging] [--profiling] [--version]
+           [&lt;project-config&gt;.yaml]
+           {fix-problems,render,run-locally,status,steps,submit-to-cluster,run-info,volatilize,runtime-info}
+           ...
+
+This script starts and controls analysis for &#39;uap&#39;.
+
+positional arguments:
+  &lt;project-config&gt;.yaml
+                        Path to YAML file that contains the pipeline configuration.
+                        The content of that file needs to follow the documentation.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         Increase output verbosity
+  --path                Report the path of the UAP installation and exit.
+  --debugging           Print traceback on UAPError.
+  --profiling           Enable profiling save report in uap.cprof.
+  --version             Display version information.
+
+subcommands:
+  Available subcommands.
+
+  {fix-problems,render,run-locally,status,steps,submit-to-cluster,run-info,volatilize,runtime-info}
+    fix-problems        Fixes problematic states by removing stall files.
+    render              Renders DOT-graphs displaying information of the analysis.
+    run-locally         Executes the analysis on the local machine.
+    status              Displays information about the status of the analysis.
+    steps               Displays information about the steps available in uap.
+    submit-to-cluster   Submits the jobs created by uap to a cluster
+    run-info            Displays information about certain source or processing runs.
+    volatilize          Saves disk space by volatilizing intermediate results
+    runtime-info        Provides Information about the runtime
+
+For complete documentation see: http://uap.readthedocs.org/en/latest/
+For citation use: ...
+For source code see: https://github.com/yigbt/uap
+</pre></div>
+</div>
+<p>Almost all subcommands require a YAML configuration file (see
+<a class="reference internal" href="configuration.html#analysis-configuration"><span class="std std-ref">Analysis Configuration File</span></a>) <strong>except</strong> for <code class="docutils literal notranslate"><span class="pre">uap</span> <span class="pre">steps</span></code>, which works
+independent of an analysis configuration file.</p>
+<p>Everytime <strong>uap</strong> is started with a
+<a class="reference internal" href="configuration.html#analysis-configuration"><span class="std std-ref">analysis configuration file</span></a> the following actions
+happen:</p>
+<ol class="arabic simple">
+<li><p>Configuration file is read</p></li>
+<li><p>Tools given in the <span class="xref std std-ref">tools section</span> are
+checked</p></li>
+<li><p>Input files are checked</p></li>
+<li><p>State of all runs are calculated</p></li>
+</ol>
+<p>If any of these steps fail, <strong>uap</strong> will exit and print an error message.</p>
+<p><strong>uap</strong> will create a symbolic link, if it does not exist already, pointing to
+the <a class="reference internal" href="configuration.html#config-file-destination-path"><span class="std std-ref">destination path</span></a> called
+<code class="docutils literal notranslate"><span class="pre">&lt;project-config&gt;.yaml-out</span></code>.
+The symbolic link is created in the directory containing the
+<code class="docutils literal notranslate"><span class="pre">&lt;project-config&gt;.yaml</span></code>.</p>
+<p>There are a couple of global command line parameters which are valid for all
+scripts:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">--even-if-dirty</span></code> or short <code class="docutils literal notranslate"><span class="pre">--even</span></code>:</dt><dd><p>If this parameter appears <strong>uap</strong> will work even if uncommited changes
+to its source code are detected.
+<strong>uap</strong> would otherwise immediately stop working.
+If you specify this flag, the repositories state is recorded in all
+annotation files created by this process.
+A full Git diff is <em>included</em> as well.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-tool-check</span></code></dt><dd><p>This disables the tool version check and can speed up, e.g., job
+submisstion with <code class="docutils literal notranslate"><span class="pre">submit-to-cluster</span></code> but is not recommended to
+use in <code class="docutils literal notranslate"><span class="pre">status</span></code> sice missing tool version may render a task
+state <code class="docutils literal notranslate"><span class="pre">changed</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--debugging</span></code></dt><dd><p>If this parameter apperas <strong>uap</strong> will print a traceback on any
+error that occures instead of just the error message.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--profiling</span></code></dt><dd><p>With this parameter the <strong>uap</strong> will use attempt to use cProfile
+and save any profiling in a file <code class="docutils literal notranslate"><span class="pre">uap.cprof</span></code> of the current
+user working directory.</p>
+</dd>
+</dl>
+<div class="section" id="subcommands">
+<span id="id1"></span><h2>Subcommands<a class="headerlink" href="#subcommands" title="Permalink to this headline">¶</a></h2>
+<p>Here an overview of all the available subcommands are given.</p>
+<div class="section" id="steps-subcommand">
+<span id="uap-steps"></span><h3><code class="docutils literal notranslate"><span class="pre">steps</span></code> Subcommand<a class="headerlink" href="#steps-subcommand" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">steps</span></code> subcommand lists all available <a class="reference internal" href="configuration.html#config-file-source-steps"><span class="std std-ref">source</span></a> and <a class="reference internal" href="configuration.html#config-file-processing-steps"><span class="std std-ref">processing</span></a>
+steps:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap steps -h
+usage: uap [&lt;project-config&gt;.yaml] steps [-h] [--even-if-dirty] [--show STEP]
+
+This script displays by default a list of all steps the pipeline can use.
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --even-if-dirty  This option must be set if the local git repository
+                   contains uncommited changes.
+                   Otherwise uap will not run.
+  --show STEP      Show the details of a specific step.
+</pre></div>
+</div>
+</div>
+<div class="section" id="status-subcommand">
+<span id="uap-status"></span><h3><code class="docutils literal notranslate"><span class="pre">status</span></code> Subcommand<a class="headerlink" href="#status-subcommand" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">status</span></code> subcommand lists all runs of an analysis.
+A run is describes the concrete processing of a sample by a step.
+Samples are usually defined at the source steps and are then propagated through
+the analysis.
+Here is the help message:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap &lt;project-config&gt;.yaml status -h
+usage: uap [&lt;project-config&gt;.yaml] status [-h] [--even-if-dirty]
+                                          [--no-tool-checks]
+                                          [--cluster CLUSTER] [--details]
+                                          [--job-ids] [--summarize] [--graph]
+                                          [--hash] [--sources]
+                                          [run [run ...]]
+
+This script displays by default information about all runs of the pipeline as configured in &#39;&lt;project-config&gt;.yaml&#39;. But the displayed information can be narrowed down via command line options.
+IMPORTANT: Hints given by this script are just valid if the jobs were submitted to the cluster.
+
+positional arguments:
+  run                The status of these runs are displayed.
+
+optional arguments:
+  -h, --help         show this help message and exit
+  --even-if-dirty    This option must be set if the local git repository contains uncommited changes.
+                     Otherwise uap will not run.
+  --no-tool-checks   This option disables the otherwise mandatory checks for tool availability and version
+  --cluster CLUSTER  Specify the cluster type. Default: [auto].
+  --details          Displays more information about task states.
+  --job-ids          Prints space seperated cluster job ids of all submitted jobs.
+  --summarize        Displays summarized information of the analysis.
+  --graph            Displays the dependency graph of the analysis.
+  --hash             Validate sha256sums to detect file changes.
+  --sources          Displays only information about the source runs.
+</pre></div>
+</div>
+<p>At any time, each run is in one of the following states:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[w]aiting</span></code> – the run is waiting for input files to appear, or its input
+files are not up-to-date regarding their respective dependencies</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[r]eady</span></code> – all input files are present and up-to-date regarding their
+upstream input files (and so on, recursively), the run is ready and can
+be started</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[q]ueued</span></code> – the run is currently queued and will be started “soon”
+(only available if you use a compute cluster)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[e]xecuting</span></code> – the run is currently running on this or another machine</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[f]inished</span></code> – all output files are in place and up-to-date</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[c]hanged</span></code> – all output files are in place but the configuration,
+parent or the commands to execute changed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[b]ad</span></code> – an error was caught during execution</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[v]olatilized</span></code> – the output was <a class="reference internal" href="#uap-volatilize">uap-volatilize</a></p></li>
+</ul>
+<p>Here is an example output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap &lt;project-config&gt;.yaml status
+Waiting tasks
+-------------
+[w] fasta_index/download
+[w] segemehl_index/Mycoplasma_genitalium_genome-download
+
+Ready tasks
+-----------
+[r] bowtie2_index/Mycoplasma_genitalium_index-download
+[r] bwa_index/Mycoplasma_genitalium_index-download
+
+Finished tasks
+--------------
+[f] M_genitalium_genome/download
+
+tasks: 5 total, 2 waiting, 2 ready, 1 finished
+</pre></div>
+</div>
+<p>To get a more concise summary, specify <code class="docutils literal notranslate"><span class="pre">--summarize</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap &lt;project-config&gt;.yaml status --summarize
+Waiting tasks
+-------------
+[w]   1 fasta_index
+[w]   1 segemehl_index
+
+Ready tasks
+-----------
+[r]   1 bowtie2_index
+[r]   1 bwa_index
+
+Finished tasks
+--------------
+[f]   1 M_genitalium_genome
+
+tasks: 5 total, 2 waiting, 2 ready, 1 finished
+</pre></div>
+</div>
+<p>… or print a fancy ASCII art graph with <code class="docutils literal notranslate"><span class="pre">--graph</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap &lt;project-config&gt;.yaml status --graph
+M_genitalium_genome (raw_url_source) [1 finished]
+└─│─│─│─bowtie2_index (bowtie2_generate_index) [1 ready]
+  └─│─│─bwa_index (bwa_generate_index) [1 ready]
+    └─│─fasta_index (samtools_faidx) [1 waiting]
+      └─segemehl_index (segemehl_generate_index) [1 waiting]
+</pre></div>
+</div>
+<p>Detailed information about a specific task can be obtained by specifying the
+run ID on the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap index_mycoplasma_genitalium_ASM2732v1_genome.yaml status \
+  bowtie2_index/Mycoplasma_genitalium_index-download
+output_directory: genomes/bacteria/Mycoplasma_genitalium/bowtie2_index/Mycoplasma_genitalium_index-download-ZsvbSjtK
+output_files:
+  out/bowtie_index:
+    Mycoplasma_genitalium_index-download.1.bt2: &amp;id001
+    - genomes/bacteria/Mycoplasma_genitalium/Mycoplasma_genitalium.ASM2732v1.fa
+    Mycoplasma_genitalium_index-download.2.bt2: *id001
+    Mycoplasma_genitalium_index-download.3.bt2: *id001
+    Mycoplasma_genitalium_index-download.4.bt2: *id001
+    Mycoplasma_genitalium_index-download.rev.1.bt2: *id001
+    Mycoplasma_genitalium_index-download.rev.2.bt2: *id001
+private_info: {}
+public_info: {}
+run_id: Mycoplasma_genitalium_index-download
+</pre></div>
+</div>
+<p>This is the known data for run
+<code class="docutils literal notranslate"><span class="pre">bowtie2_index/Mycoplasma_genitalium_index-download</span></code>.
+It contains information about the output folder, the output files and the
+input files they depend on as well as the run ID and the run state.</p>
+<p>Source steps can be viewed separately by specifying <code class="docutils literal notranslate"><span class="pre">--sources</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap &lt;project-config&gt;.yaml status --sources
+M_genitalium_genome/download
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-info-subcommand">
+<span id="uap-run-info"></span><h3><code class="docutils literal notranslate"><span class="pre">run-info</span></code> Subcommand<a class="headerlink" href="#run-info-subcommand" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">run-info</span></code> subcommand displays the commands issued for a given run.
+The output looks like a BASH script, but might not be functional.
+This is due to the fact that output redirections for some commands
+are missing in the BASH script.</p>
+<p>An example output showing the download of the <em>Mycoplasma genitalium</em> genome:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap index_mycoplasma_genitalium_ASM2732v1_genome.yaml run-info --even M_genitalium_genome/download
+#!/usr/bin/env bash
+
+# M_genitalium_genome/download -- Report
+# ======================================
+#
+# output_directory: genomes/bacteria/Mycoplasma_genitalium/M_genitalium_genome/download-7RncJ4tr
+# output_files:
+#   out/raw:
+#     genomes/bacteria/Mycoplasma_genitalium/Mycoplasma_genitalium.ASM2732v1.fa: []
+# private_info: {}
+# public_info: {}
+# run_id: download
+#
+# M_genitalium_genome/download -- Commands
+# ========================================
+
+# 1. Group of Commands -- 1. Command
+# ----------------------------------
+
+curl ftp://ftp.ncbi.nih.gov/genomes/genbank/bacteria/Mycoplasma_genitalium/latest_assembly_versions/GCA_000027325.1_ASM2732v1/GCA_000027325.1_ASM2732v1_genomic.fna.gz
+
+# 2. Group of Commands -- 1. Command
+# ----------------------------------
+
+../tools/compare_secure_hashes.py --algorithm md5 --secure-hash f02c78b5f9e756031eeaa51531517f24 genomes/bacteria/Mycoplasma_genitalium/M_genitalium_genome/download-7RncJ4tr/L9PXBmbPKlemghJGNM97JwVuzMdGCA_000027325.1_ASM2732v1_genomic.fna.gz
+
+# 3. Group of Commands -- 1. Pipeline
+# -----------------------------------
+
+pigz --decompress --stdout --processes 1 genomes/bacteria/Mycoplasma_genitalium/M_genitalium_genome/download-7RncJ4tr/L9PXBmbPKlemghJGNM97JwVuzMdGCA_000027325.1_ASM2732v1_genomic.fna.gz | dd bs=4M of=/home/hubert/develop/uap/example-configurations/genomes/bacteria/Mycoplasma_genitalium/Mycoplasma_genitalium.ASM2732v1.fa
+</pre></div>
+</div>
+<p>This subcommand enables the user to manually run parts of the analysis without
+<strong>uap</strong>.
+That can be helpful for debugging steps during development.</p>
+</div>
+<div class="section" id="run-locally-subcommand">
+<span id="uap-run-locally"></span><h3><code class="docutils literal notranslate"><span class="pre">run-locally</span></code> Subcommand<a class="headerlink" href="#run-locally-subcommand" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">run-locally</span></code> subcommand runs all non-finished runs (or a specified
+subset) sequentially on the local machine.
+The execution can be cancelled at any time, it won’t put your project in a
+unstable state.
+However, if the <code class="docutils literal notranslate"><span class="pre">run-locally</span></code> subcommand receives a <a href="https://en.wikipedia.org/wiki/Unix_signal#SIGKILL" target="_blank">SIGKILL</a> signal, the
+currently executing job will continue to run and the corresponding run
+will be reported as <code class="docutils literal notranslate"><span class="pre">executing</span></code> by calling <code class="docutils literal notranslate"><span class="pre">status</span></code> subcommand for five more
+minutes (<a href="https://en.wikipedia.org/wiki/Unix_signal#SIGTERM" target="_blank">SIGTERM</a> should be fine and exit gracefully but
+<em>doesn’t just yet</em>).
+After that time, you will be warned that a job is marked as being currently
+run but no activity has been seen for a while, along with further
+instructions about what to do in such a case (don’t worry, it shouldn’t
+happen by accident).</p>
+<p>Specify a set of run IDs to execute only those runs.
+Specify the name of a step to execute all ready runs of that step.</p>
+<p>This subcommands usage information:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap index_mycoplasma_genitalium_ASM2732v1_genome.yaml run-locally -h
+usage: uap [&lt;project-config&gt;.yaml] run-locally [-h] [--even-if-dirty]
+                                               [--no-tool-checks] [--force]
+                                               [--ignore]
+                                               [run [run ...]]
+
+This command  starts &#39;uap&#39; on the local machine. It can be used to start:
+ * all runs of the pipeline as configured in &lt;project-config&gt;.yaml
+ * all runs defined by a specific step in &lt;project-config&gt;.yaml
+ * one or more steps
+To start the complete pipeline as configured in &lt;project-config&gt;.yaml execute:
+$ uap &lt;project-config&gt;.yaml run-locally
+To start a specific step execute:
+$ uap &lt;project-config&gt;.yaml run-locally &lt;step_name&gt;
+To start a specific run execute:
+$ uap &lt;project-config&gt;.yaml run-locally &lt;step/run&gt;
+The step_name is the name of an entry in the &#39;steps:&#39; section as defined in &#39;&lt;project-config&gt;.yaml&#39;. A specific run is defined via its run ID &#39;step/run&#39;. To get a list of all run IDs please run:
+$ uap &lt;project-config&gt;.yaml status
+
+positional arguments:
+  run               These runs are processed on the local machine.
+
+optional arguments:
+  -h, --help        show this help message and exit
+  --even-if-dirty   This option must be set if the local git repository contains uncommited changes.
+                    Otherwise uap will not run.
+  --no-tool-checks  This option disables the otherwise mandatory checks for tool availability and version
+  --force           Force to overwrite changed tasks.
+  --ignore          Ignore chages of tasks and consider them finished.
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Why is it safe to cancel the pipeline?
+The pipeline is written in a way which expects processes to fail or
+cluster jobs to disappear without notice.
+This problem is mitigated by a design which relies on file presence and
+file timestamps to determine whether a run is finished or not.
+Output files are automatically written to temporary locations and later
+moved to their real target directory, and it is not until the last file
+rename operation has finished that a run is regarded as finished.</p>
+</div>
+</div>
+<div class="section" id="submit-to-cluster-subcommand">
+<span id="uap-submit-to-cluster"></span><h3><code class="docutils literal notranslate"><span class="pre">submit-to-cluster</span></code> Subcommand<a class="headerlink" href="#submit-to-cluster-subcommand" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">submit-to-cluster</span></code> subcommand determines which runs still need to be
+executed and which supported cluster engine is available.
+It submits a job for every run to the cluster if a cluster engine could be
+detected.
+Dependencies are passed to cluster engine in a way that jobs that depend on
+other jobs won’t get scheduled until their dependencies have been satisfied.
+For more information read about the
+<a class="reference internal" href="configuration.html#cluster-configuration"><span class="std std-ref">cluster configuration</span></a> and the
+<a class="reference internal" href="configuration.html#submit-template"><span class="std std-ref">submit script template</span></a>.
+Each submitted job calls <strong>uap</strong> with the <code class="docutils literal notranslate"><span class="pre">run-locally</span></code> subcommand on the
+executing cluster node.</p>
+<p>Here is the usage information:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap index_mycoplasma_genitalium_ASM2732v1_genome.yaml submit-to-cluster -h
+usage: uap [&lt;project-config&gt;.yaml] submit-to-cluster [-h] [--even-if-dirty]
+                                                     [--no-tool-checks]
+                                                     [--cluster CLUSTER]
+                                                     [--legacy] [--force]
+                                                     [--ignore]
+                                                     [run [run ...]]
+
+This script submits all runs configured in &lt;project-config&gt;.yaml to a cluster. The configuration for the available cluster types is stored at /&lt;path-to-uap&gt;/cluster/cluster-specific-commands.yaml. The list of runs can be narrowed down to specific steps. All runs of the specified step will be submitted to the cluster. Also, individual runs IDs (step/run) can be used for submission.
+
+positional arguments:
+  run                Submit only these runs to the cluster.
+
+optional arguments:
+  -h, --help         show this help message and exit
+  --even-if-dirty    This option must be set if the local git repository contains uncommited changes.
+                     Otherwise uap will not run.
+  --no-tool-checks   This option disables the otherwise mandatory checks for tool availability and version
+  --cluster CLUSTER  Specify the cluster type. Default: [auto].
+  --legacy           Use none array cluster submission.
+  --force            Force to overwrite changed tasks.
+  --ignore           Ignore chages of tasks and consider them finished.
+</pre></div>
+</div>
+</div>
+<div class="section" id="fix-problems-subcommand">
+<span id="uap-fix-problems"></span><h3><code class="docutils literal notranslate"><span class="pre">fix-problems</span></code> Subcommand<a class="headerlink" href="#fix-problems-subcommand" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">fix-problems</span></code> subcommand removes temporary files written by <strong>uap</strong> if
+they are not required anymore.</p>
+<p>Here is the usage information:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap &lt;project-config&gt;.yaml fix-problems -h
+usage: uap [&lt;project-config&gt;.yaml] fix-problems [-h] [--even-if-dirty]
+                                                [--no-tool-checks]
+                                                [--cluster CLUSTER]
+                                                [--first-error]
+                                                [--file-modification-date]
+                                                [--details] [--srsly]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --even-if-dirty       This option must be set if the local git repository contains uncommited changes.
+                        Otherwise uap will not run.
+  --no-tool-checks      This option disables the otherwise mandatory checks for tool availability and version
+  --cluster CLUSTER     Specify the cluster type. Default: [auto].
+  --first-error         Print stderr of the first failed cluster job.
+  --file-modification-date
+                        If the sha256sum of the result is correct, reset the modification date.
+  --details             Displays information about the files causing problems.
+  --srsly               Delete problematic files.
+</pre></div>
+</div>
+<p><strong>uap</strong> writes temporary files to indicate if a job is queued or executed.
+Sometimes (especially on the compute cluster) jobs fail, without even starting
+<strong>uap</strong>.
+This leaves the temporary file, written on job submission, indicating that a run
+was queued on the cluster without process (because it already failed).
+The <code class="docutils literal notranslate"><span class="pre">status</span></code> subcommand will inform the user if <code class="docutils literal notranslate"><span class="pre">fix-problems</span></code> needs to be
+executed to clean up these files.</p>
+<p>In another scenario the output of the <strong>uap</strong> was copied to a new location.
+This may have changed the modification dates the output files and the <strong>uap</strong>
+will not consider them finished if the order of modification contradicts
+the dependencies. <code class="docutils literal notranslate"><span class="pre">--file-modification-date</span></code> changes them to when the task completed
+but only if the sha256sums are still correct and the <code class="docutils literal notranslate"><span class="pre">--srsly</span></code> argument is passed.</p>
+</div>
+<div class="section" id="volatilize-subcommand">
+<span id="uap-volatilize"></span><h3><code class="docutils literal notranslate"><span class="pre">volatilize</span></code> Subcommand<a class="headerlink" href="#volatilize-subcommand" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">volatilize</span></code> subcommand is useful to reduce the required disk space of
+your analysis.
+It works only if the <a class="reference internal" href="configuration.html#config-file-volatile"><span class="std std-ref">_volatile</span></a> keyword is set in
+the <a class="reference internal" href="configuration.html#analysis-configuration"><span class="std std-ref">analysis configuration file</span></a> for.
+As already mentioned there, steps marked as <code class="docutils literal notranslate"><span class="pre">_volatile</span></code> compute their output
+files as normal but can be replaced by placeholder files if their dependent
+steps are finished.</p>
+<p>This subcommand provides usage information:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap &lt;project-config&gt;.yaml volatilize -h
+
+usage: uap [&lt;project-config&gt;.yaml] volatilize [-h] [--even-if-dirty]
+                                              [--details] [--srsly]
+
+Save disk space by volatilizing intermediate results. Only steps marked with &#39;_volatile: True&#39; are considered.
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --even-if-dirty  This option must be set if the local git repository
+                   contains uncommited changes.
+                   Otherwise uap will not run.
+  --details        Shows which files can be volatilized.
+  --srsly          Replaces files marked for volatilization with a placeholder.
+</pre></div>
+</div>
+<p>After running <code class="docutils literal notranslate"><span class="pre">volatilize</span> <span class="pre">--srsly</span></code> the output files of the volatilized step
+are replaced by placeholder files.
+The placeholder files have the same name as the original files suffixed with
+<code class="docutils literal notranslate"><span class="pre">.volatile.placeholder.yaml</span></code>.</p>
+</div>
+<div class="section" id="render-subcommand">
+<span id="uap-render"></span><h3><code class="docutils literal notranslate"><span class="pre">render</span></code> Subcommand<a class="headerlink" href="#render-subcommand" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">render</span></code> subcommand generates graphs using graphviz.
+The graphs either show the complete analysis or the execution of a single run.
+At the moment <code class="docutils literal notranslate"><span class="pre">--simple</span></code> only has an effect in combination with <code class="docutils literal notranslate"><span class="pre">--steps</span></code>.</p>
+<p>This subcommand provides usage information:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap &lt;project-config&gt;.yaml render -h
+usage: uap [&lt;project-config&gt;.yaml] render [-h] [--even-if-dirty] [--files]
+                                          [--steps] [--simple]
+                                          [--orientation {left-to-right,right-to-left,top-to-bottom}]
+                                          [run [run ...]]
+
+&#39;render&#39; generates DOT-graphs. Without arguments
+it takes the annotation file of each run and generates a graph,
+showing details of the computation.
+
+positional arguments:
+  run                   Render only graphs for these runs.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --even-if-dirty       This option must be set if the local git repository
+                        contains uncommited changes.
+                        Otherwise uap will not run.
+  --files               Renders a graph showing all files of the analysis.
+                        [Not implemented yet!]
+  --steps               Renders a graph showing all steps of the analysis and
+                        their connections.
+  --simple              Simplify rendered graphs.
+  --orientation {left-to-right,right-to-left,top-to-bottom}
+                        Defines orientation of the graph.
+                        Default: &#39;top-to-bottom&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="extension.html" class="btn btn-neutral float-right" title="Add New Functionality" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="configuration.html" class="btn btn-neutral float-left" title="Analysis Configuration File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christoph Kämpf, Michael Specht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

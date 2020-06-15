@@ -1,0 +1,698 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Extension of uap &mdash; uap 2.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tested Platforms" href="platforms.html" />
+    <link rel="prev" title="Command-Line Usage of uap" href="interaction.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> uap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introducing <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#software-design">Software Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#recommended-uap-workflow">Recommended <strong>uap</strong> Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to.html">Quick Start <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Analysis Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html#cluster-configuration-file">Cluster Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interaction.html">Command-Line Usage of <strong>uap</strong></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Add New Functionality</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#implement-new-steps">Implement New Steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-import-statements-and-logger">Step 1: Import Statements and Logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-class-definition">Step 2: Class Definition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-init-method">Step 3: <code class="docutils literal notranslate"><span class="pre">__init__</span></code> Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-4-runs-method">Step 4: <code class="docutils literal notranslate"><span class="pre">runs</span></code> Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-5-add-the-new-step-to-uap">Step 5: Add the new step to <strong>uap</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage-of-dd-and-mkfifo">Usage of <code class="docutils literal notranslate"><span class="pre">dd</span></code> and <code class="docutils literal notranslate"><span class="pre">mkfifo</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Tested Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annotation.html">Annotation Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="steps.html">Available steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Information for uap Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">uap</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Extension of uap</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/extension.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="add-new-functionality">
+<span id="extending-uap"></span><h1>Add New Functionality<a class="headerlink" href="#add-new-functionality" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="implement-new-steps">
+<h2>Implement New Steps<a class="headerlink" href="#implement-new-steps" title="Permalink to this headline">¶</a></h2>
+<p><strong>uap</strong> can be easily extended by implementing new
+<a class="reference internal" href="configuration.html#config-file-source-steps"><span class="std std-ref">source</span></a> or
+<a class="reference internal" href="configuration.html#config-file-processing-steps"><span class="std std-ref">processing</span></a> steps.
+This requires basic python programming skills.
+New steps are added to <strong>uap</strong> by placing a single Python file into one of these
+folders in the <strong>uap</strong> installation directory:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">include/sources</span></code></dt><dd><p>Place source step files here</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">include/steps</span></code></dt><dd><p>Place processing step files here</p>
+</dd>
+</dl>
+<p>Let’s talk about how to implement such <strong>uap</strong> steps.</p>
+<div class="section" id="step-1-import-statements-and-logger">
+<span id="extending-import"></span><h3>Step 1: Import Statements and Logger<a class="headerlink" href="#step-1-import-statements-and-logger" title="Permalink to this headline">¶</a></h3>
+<p>At the beginning of every step please import the required modules and create a
+logger object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># First import standard libraries</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+
+<span class="c1"># Secondly import third party libraries</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="c1"># Thirdly import local application files</span>
+<span class="kn">from</span> <span class="nn">abstract_step</span> <span class="kn">import</span> <span class="n">AbstractStep</span> <span class="c1"># or AbstractSourceStep</span>
+<span class="kn">from</span> <span class="nn">uaperrors</span> <span class="kn">import</span> <span class="n">UAPError</span>
+
+<span class="c1"># Get application wide logger</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;uap_logger&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Essential imports are the <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">logging</span> <span class="pre">import</span> <span class="pre">getLogger</span></code>,
+<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">abstract_step</span> <span class="pre">import</span> <span class="pre">...</span></code> and <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">uaperrors</span> <span class="pre">import</span> <span class="pre">UAPError</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">logger</span></code> can be used to log messages on different verbosity levels
+(e.g. <code class="docutils literal notranslate"><span class="pre">logger.debug</span></code>, <code class="docutils literal notranslate"><span class="pre">logger.info</span></code>, <code class="docutils literal notranslate"><span class="pre">logger.warning</span></code>). The <code class="docutils literal notranslate"><span class="pre">UAPError</span></code>
+can be used to raise UAÜ specific errors with <code class="docutils literal notranslate"><span class="pre">raise</span> <span class="pre">UAPError(&lt;message&gt;)</span></code>.
+<code class="docutils literal notranslate"><span class="pre">AbstractStep</span></code> and <code class="docutils literal notranslate"><span class="pre">AbstractSourceStep</span></code> are available parent classes
+from which the new implementation musst inherit its methods.</p>
+</div>
+<div class="section" id="step-2-class-definition">
+<span id="extending-class-def"></span><h3>Step 2: Class Definition<a class="headerlink" href="#step-2-class-definition" title="Permalink to this headline">¶</a></h3>
+<p>Now you need to define a class (which inherits either from <code class="docutils literal notranslate"><span class="pre">AbstractStep</span></code> or
+<code class="docutils literal notranslate"><span class="pre">AbstractSourceStep</span></code>) and its <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ConcatenateFiles</span><span class="p">(</span><span class="n">AbstractStep</span><span class="p">):</span>
+    <span class="c1"># Overwrite initialisation</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">):</span>
+        <span class="c1"># Call super classes initialisation</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConcatenateFiles</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span>
+
+<span class="o">..</span>
+</pre></div>
+</div>
+<p>The new class needs to be derived from either <code class="docutils literal notranslate"><span class="pre">AbstractStep</span></code>, for processing
+steps, or <code class="docutils literal notranslate"><span class="pre">AbstractSourceStep</span></code>, for source steps.</p>
+</div>
+<div class="section" id="step-3-init-method">
+<span id="extending-class-init"></span><h3>Step 3: <code class="docutils literal notranslate"><span class="pre">__init__</span></code> Method<a class="headerlink" href="#step-3-init-method" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method is the place where you should declare:</p>
+<dl>
+<dt>Tools via <code class="docutils literal notranslate"><span class="pre">self.require_tool('tool_name')</span></code>:</dt><dd><p>Steps usually require tools to perform their task.
+Each tool that is going to be used by a step needs to be requested via the
+method <code class="docutils literal notranslate"><span class="pre">require_tool('tool_name')</span></code>.
+<strong>uap</strong> tests the existence of the required tools whenever it constructs the
+directed acyclic graph (DAG) of the analysis.
+The test is based on the information provided in the
+<span class="xref std std-ref">tools section</span> of the
+<a class="reference internal" href="configuration.html#analysis-configuration"><span class="std std-ref">analysis configuration</span></a>.
+An entry for <code class="docutils literal notranslate"><span class="pre">tool_name</span></code> has to exist and to provide information to verify
+the tools accessibility.</p>
+</dd>
+<dt>Connections via <code class="docutils literal notranslate"><span class="pre">add_connection(...)</span></code>:</dt><dd><p>Connections are defined by the method <code class="docutils literal notranslate"><span class="pre">add_connection(...)</span></code>.
+They are used to transfer data from one step to another.
+If a step defines an output connection <code class="docutils literal notranslate"><span class="pre">out/something</span></code> and a subsequent
+step defines an input connection named <code class="docutils literal notranslate"><span class="pre">in/something</span></code>, then the files
+beloging to <code class="docutils literal notranslate"><span class="pre">out/something</span></code> will be available via the connection
+<code class="docutils literal notranslate"><span class="pre">in/something</span></code>.</p>
+<p>Please name connection in a way that they describe the data itself and
+<strong>NOT</strong> the data type.
+For instance, use <code class="docutils literal notranslate"><span class="pre">in/genome</span></code> over <code class="docutils literal notranslate"><span class="pre">in/fasta</span></code>.</p>
+<p>The first parameters of the method musst be a <code class="docutils literal notranslate"><span class="pre">tag</span></code> and all other
+parameter should be passed with their respective keyword:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">tag</span></code></dt><dd><p>The name of the connection. It musst start with <code class="docutils literal notranslate"><span class="pre">in/</span></code> to declare an
+input connection or <code class="docutils literal notranslate"><span class="pre">out/</span></code> to declare an output connection.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span></code> (Boolean, default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</dt><dd><p>Defines if the connection is mandatory (<code class="docutils literal notranslate"><span class="pre">False</span></code>) or optional
+(<code class="docutils literal notranslate"><span class="pre">True</span></code>). A mendatory connection will be checked more
+rigorously.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">format</span></code></dt><dd><p>Descripes the expected file formats to aid the user.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">description</span></code></dt><dd><p>Descripes the content to aid the user. The string is used in
+for the documentation with <a href="https://www.sphinx-doc.org/" target="_blank">sphinx</a> and <a href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html" target="_blank">reStructuredText</a>
+markups can be used.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+<dt>Options via <code class="docutils literal notranslate"><span class="pre">self.add_option()</span></code>:</dt><dd><p>Options allow to influence the commands executed by a step.
+It is advisable to provide as many meaningful options as possible to keep
+steps flexible.
+Options are defined via the method <code class="docutils literal notranslate"><span class="pre">add_option()</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">add_option()</span></code> method allows to specify various information about
+the option.
+The method parameters are these:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">key</span></code></dt><dd><p>name of the option (if possible include the name of the tool
+this option influences e.g. <code class="docutils literal notranslate"><span class="pre">dd-blocksize</span></code> to set <code class="docutils literal notranslate"><span class="pre">dd</span></code> blocksize)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">option_type</span></code></dt><dd><p>The option type has to be at least one of <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>,
+<code class="docutils literal notranslate"><span class="pre">bool</span></code>, <code class="docutils literal notranslate"><span class="pre">list</span></code>, or <code class="docutils literal notranslate"><span class="pre">dict</span></code>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">optional</span></code> (Boolean, default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</dt><dd><p>Defines if the option is mandatory (<code class="docutils literal notranslate"><span class="pre">False</span></code>) or optional (<code class="docutils literal notranslate"><span class="pre">True</span></code>).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">choices</span></code></dt><dd><p>List of valid values for the option.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">default</span></code> (default <code class="docutils literal notranslate"><span class="pre">None</span></code>)</dt><dd><p>Defines the default value for the option.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">description</span></code></dt><dd><p>The description of the functionality of the option.
+The string is used in for the documentation with <a href="https://www.sphinx-doc.org/" target="_blank">sphinx</a>
+and <a href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html" target="_blank">reStructuredText</a> markups can be used.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">..</span>
+
+        <span class="c1"># Define connections</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="s1">&#39;in/text&#39;</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;txt&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">],</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Contains certain information.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="s1">&#39;out/text&#39;</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;txt&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;The result.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Request tools</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">require_tool</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Options for workflow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;concatenate_all_files&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Concatenate all files from &quot;</span>
+                        <span class="s2">&quot;all runs, if &#39;True&#39;.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Options for &#39;cat&#39; (see manpage)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;show-all&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show all characters&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;number-nonblank&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;number nonempty output lines, &quot;</span>
+                        <span class="s2">&quot;overrides --number&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;show-ends&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;display $ at end of each line&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;number all output lines&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;squeeze-blank&quot;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;suppress repeated empty output lines&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;show-tabs&quot;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;display TAB characters as ^I&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;show-nonprinting&quot;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;use ^ and M- notation, except for &quot;</span>
+                         <span class="s2">&quot;LFD and TAB&quot;</span><span class="p">)</span>
+
+<span class="o">..</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-4-runs-method">
+<span id="extending-class-runs"></span><h3>Step 4: <code class="docutils literal notranslate"><span class="pre">runs</span></code> Method<a class="headerlink" href="#step-4-runs-method" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">runs</span></code> method is where all the work is done.
+This method gets handed over an instance of the
+<a class="reference internal" href="api.html#connectionscollector"><span class="std std-ref">ConnectionsCollector</span></a>
+which can be used like a dictionary of dictionaries.
+The keys of the first dictionary are the run IDs (often resembling the samples).
+The values of the first dictionary is another dictionary.
+The keys of that second dictionary are the connections e.g. “in/text” and the
+values are the corresponding files belonging to that connection.</p>
+<p>Let’s inspect all the run IDs, connections, and input files we got from our
+upstream steps for all runs that have the connection <code class="docutils literal notranslate"><span class="pre">in/testconnection</span></code>.
+And let’s tore all files we received in a list for later use.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">..</span>
+
+    <span class="k">def</span> <span class="nf">runs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cc</span><span class="p">):</span>
+        <span class="n">all_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="c1"># Let&#39;s inspect the cc data structure</span>
+        <span class="n">run_ids</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">get_runs_with_connections</span><span class="p">(</span><span class="s1">&#39;in/testconnection&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="n">run_ids</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Run ID: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">run_id</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">cc</span><span class="p">[</span><span class="n">run_id</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Connection: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">connection</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">in_file</span> <span class="ow">in</span> <span class="n">cc</span><span class="p">[</span><span class="n">run_id</span><span class="p">][</span><span class="n">connection</span><span class="p">]:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Input file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_file</span><span class="p">)</span>
+                    <span class="c1"># Collect all files</span>
+                    <span class="n">all_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">in_file</span><span class="p">)</span>
+
+<span class="o">..</span>
+</pre></div>
+</div>
+<p>It comes in handy to assemble a list with all options for <code class="docutils literal notranslate"><span class="pre">cat</span></code> here.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">..</span>
+
+     <span class="c1"># List with options for &#39;cat&#39;</span>
+     <span class="n">cat_options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;show-all&#39;</span><span class="p">,</span> <span class="s1">&#39;number-nonblank&#39;</span><span class="p">,</span> <span class="s1">&#39;show-ends&#39;</span><span class="p">,</span> <span class="s1">&#39;number&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;squeeze-blank&#39;</span><span class="p">,</span> <span class="s1">&#39;show-tabs&#39;</span><span class="p">,</span> <span class="s1">&#39;show-nonprinting&#39;</span><span class="p">]</span>
+
+     <span class="c1"># Get all options which were set</span>
+     <span class="n">set_options</span> <span class="o">=</span> <span class="p">[</span><span class="n">option</span> <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">cat_options</span> <span class="k">if</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">is_option_set_in_config</span><span class="p">(</span><span class="n">option</span><span class="p">)]</span>
+
+     <span class="c1"># Compile the list of options</span>
+     <span class="n">cat_option_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+     <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">set_options</span><span class="p">:</span>
+         <span class="c1"># bool options look different than ...</span>
+         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="n">option</span><span class="p">),</span> <span class="nb">bool</span><span class="p">):</span>
+             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="n">option</span><span class="p">):</span>
+                 <span class="n">cat_option_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">option</span><span class="p">)</span>
+         <span class="c1"># ... the rest ...</span>
+         <span class="k">else</span><span class="p">:</span>
+             <span class="n">cat_option_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">option</span><span class="p">)</span>
+             <span class="c1"># ... make sure to cast the values to string</span>
+             <span class="n">cat_option_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="n">option</span><span class="p">)))</span>
+
+<span class="o">..</span>
+</pre></div>
+</div>
+<p>What should happen if we are told to concatenate all files from all input runs?
+We have to create a single run with a new run ID ‘all_files’.
+The run consists of a <code class="docutils literal notranslate"><span class="pre">exec_group</span></code> that runs the <code class="docutils literal notranslate"><span class="pre">cat</span></code> command.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An <code class="docutils literal notranslate"><span class="pre">exec_group</span></code> is a list of commands which are executed in one go.
+You might create multiple <code class="docutils literal notranslate"><span class="pre">exec_group</span></code>’s if you need to make sure a set of
+commands finished before another set is started.
+An <code class="docutils literal notranslate"><span class="pre">exec_group</span></code> can contain commands and pipelines.
+They can be added like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add a single command</span>
+<span class="n">exec_group</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Add a pipeline to an exec_group</span>
+<span class="n">pipe</span> <span class="o">=</span> <span class="n">exec_group</span><span class="o">.</span><span class="n">add_pipeline</span><span class="p">()</span>
+<span class="c1"># Add a command to a pipeline</span>
+<span class="n">pipe</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The result of the concatenation is written to an output file.
+The run object needs to know about each output file that is going to be created.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An output file is announced via the run objects
+<code class="docutils literal notranslate"><span class="pre">add_output_file(tag,</span> <span class="pre">out_path,</span> <span class="pre">in_paths)</span></code> method.
+The method parameters are:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tag</span></code>: The name of the out connection e.g. ‘text’ for ‘out/text’</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">out_path</span></code>: The name of the output file (best practice is to add the
+run ID to the file name)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">in_paths</span></code>: The input files this output file is based on</p></li>
+</ol>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">..</span>
+
+     <span class="c1"># Okay let&#39;s concatenate all files we get</span>
+     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;concatenate_all_files&#39;</span><span class="p">):</span>
+
+         <span class="c1"># New run named &#39;all_files&#39; is created here</span>
+         <span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">declare_run</span><span class="p">(</span><span class="s1">&#39;all_files&#39;</span><span class="p">)</span>
+
+         <span class="c1"># Create an exec</span>
+         <span class="n">exec_group</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">new_exec_group</span><span class="p">()</span>
+         <span class="c1"># Assemble the cat command</span>
+         <span class="n">cat</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">)</span> <span class="p">]</span>
+         <span class="c1"># Add the options to the command</span>
+         <span class="n">cat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">cat_option_list</span> <span class="p">)</span>
+         <span class="n">cat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">all_files</span> <span class="p">)</span>
+
+         <span class="c1"># Now add the command to the execution group</span>
+         <span class="n">exec_group</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span>
+             <span class="n">cat</span><span class="p">,</span>
+             <span class="n">stdout_path</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">add_output_file</span><span class="p">(</span>
+                 <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                 <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_concatenated.txt&quot;</span> <span class="o">%</span> <span class="n">run_id</span><span class="p">,</span>
+                 <span class="n">all_files</span><span class="p">)</span>
+         <span class="p">)</span>
+
+<span class="o">..</span>
+</pre></div>
+</div>
+<p>What should happen if all files of an input run have to be concatenated?
+We create a new run for each input run and concatenate all files that
+belong to the input run.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Concatenate all files from a runs &#39;in/text&#39; connection</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># iterate over all run IDs ...</span>
+    <span class="k">for</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="n">cc</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">input_paths</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="n">run_id</span><span class="p">][</span><span class="s1">&#39;in/text&#39;</span><span class="p">]</span>
+        <span class="c1"># ... and declare a new run for each of them.</span>
+        <span class="n">exec_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">declare_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span><span class="o">.</span><span class="n">new_exec_group</span><span class="p">()</span>
+        <span class="c1"># Assemble the cat command</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">)</span> <span class="p">]</span>
+        <span class="c1"># Add the options to the command</span>
+        <span class="n">cat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">cat_option_list</span> <span class="p">)</span>
+        <span class="n">cat</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">input_paths</span> <span class="p">)</span>
+
+        <span class="c1"># Now add the command to the execution group</span>
+        <span class="n">exec_group</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span>
+            <span class="n">cat</span><span class="p">,</span>
+            <span class="n">stdout_path</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">add_output_file</span><span class="p">(</span>
+                <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_concatenated.txt&quot;</span> <span class="o">%</span> <span class="n">run_id</span><span class="p">,</span>
+                <span class="n">input_paths</span><span class="p">)</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<p>That’s it.
+You created your first <strong>uap</strong> processing step.</p>
+</div>
+<div class="section" id="step-5-add-the-new-step-to-uap">
+<h3>Step 5: Add the new step to <strong>uap</strong><a class="headerlink" href="#step-5-add-the-new-step-to-uap" title="Permalink to this headline">¶</a></h3>
+<p>You have to make the new step known to <strong>uap</strong>.
+Save the complete file into <strong>uap</strong>’s <code class="docutils literal notranslate"><span class="pre">include/steps</span></code> folder.
+Processing step files are located at <strong>uap</strong>’s <code class="docutils literal notranslate"><span class="pre">include/steps/</span></code> folder
+and source step files at <strong>uap</strong>’s <code class="docutils literal notranslate"><span class="pre">include/sources/</span></code> folder.</p>
+<p>You can control that your step is correctly “installed” if its included in the
+list of all source and processing steps:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ls -la $(uap --path)/include/sources
+... Lists all available source step files
+
+$ ls -la $(uap --path)/include/steps
+... Lists all available processing step files
+</pre></div>
+</div>
+<p>You can also use <strong>uap</strong>’s <a class="reference internal" href="interaction.html#uap-steps"><span class="std std-ref">steps</span></a> subcommand to get
+information about installed steps.</p>
+<p>If the step file exists at the correct location that step can be used
+in an <a class="reference internal" href="configuration.html#analysis-configuration"><span class="std std-ref">analysis configuration file</span></a>.</p>
+<p>A potential example YAML file named <code class="docutils literal notranslate"><span class="pre">test.yaml</span></code> could look like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">destination_path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">example-out/test/</span>
+
+<span class="nt">steps</span><span class="p">:</span>
+    <span class="c1">##################</span>
+    <span class="c1">## Source steps ##</span>
+    <span class="c1">##################</span>
+
+    <span class="nt">raw_file_source</span><span class="p">:</span>
+        <span class="nt">pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">example-data/text-files/*.txt</span>
+        <span class="nt">group</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">(.*).txt</span>
+
+    <span class="c1">######################</span>
+    <span class="c1">## Processing steps ##</span>
+    <span class="c1">######################</span>
+
+    <span class="nt">cat</span><span class="p">:</span>
+        <span class="nt">_depends</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">raw_file_source</span>
+        <span class="nt">_connect</span><span class="p">:</span>
+            <span class="nt">in/text</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">raw_file_source/raw</span>
+        <span class="nt">concatenate_all_files</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+
+<span class="nt">tools</span><span class="p">:</span>
+    <span class="nt">cat</span><span class="p">:</span>
+        <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cat</span>
+        <span class="nt">get_version</span><span class="p">:</span> <span class="s">&#39;--version&#39;</span>
+        <span class="nt">exit_code</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+</pre></div>
+</div>
+<p>You need to create the destination path and some text files matching the
+pattern <code class="docutils literal notranslate"><span class="pre">example-data/text-files/*.txt</span></code>.
+Also you see the work of the <code class="docutils literal notranslate"><span class="pre">_connect</span></code> keyword in play.
+Check the status of the configured analysis:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uap test.yaml status
+Ready runs
+----------
+[r] cat/Hello_america
+[r] cat/Hello_asia
+[r] cat/Hello_europe
+[r] cat/Hello_world
+
+runs: 4 total, 4 ready
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="best-practices">
+<span id="extending-best-practices"></span><h2>Best Practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h2>
+<p>There are a couple of things you should keep in mind while implementing new
+steps or modifying existing ones:</p>
+<ul class="simple">
+<li><p><strong>NEVER</strong>  remove files!
+If files need to be removed report the issue and exit <strong>uap</strong> or force the
+user to call a specific subcommand.
+Never delete files without permission by the user.</p></li>
+<li><p>Make sure errors already show up when the steps <code class="docutils literal notranslate"><span class="pre">runs()</span></code> method is
+called.
+Stick to <em>fail early, fail often</em>.
+That way errors show up before submitting jobs to the cluster and
+cluster waiting time is not wasted.</p></li>
+<li><p>Make sure that all tools which you request with <code class="docutils literal notranslate"><span class="pre">self.require_tool()</span></code>
+are also used in the <code class="docutils literal notranslate"><span class="pre">runs()</span></code> method.
+Use the <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> method to request tools.</p></li>
+<li><p>Always call <code class="docutils literal notranslate"><span class="pre">os.path.abspath</span></code> on files that are passed via an option
+to enable files references relativ to an uap config for your step.</p></li>
+<li><p>Make sure your disk access is as cluster-friendly as possible (which
+primarily means using large block sizes and preferably no seek operations).
+If possible, use pipelines to wrap your commands in <code class="docutils literal notranslate"><span class="pre">pigz</span></code> or <code class="docutils literal notranslate"><span class="pre">dd</span></code>
+commands.
+Make the used block size configurable.
+Although this is not possible in every case (for example when seeking
+in files is involved), it is straightforward with tools that read a
+continuous stream from <code class="docutils literal notranslate"><span class="pre">stdin</span></code> and write a continuous stream to
+<code class="docutils literal notranslate"><span class="pre">stdout</span></code>.</p></li>
+<li><p>Always use <code class="docutils literal notranslate"><span class="pre">os.path.join(...)</span></code> to handle paths.</p></li>
+<li><p>Use bash commands like <code class="docutils literal notranslate"><span class="pre">mkfifo</span></code> over python library equivalents like
+<code class="docutils literal notranslate"><span class="pre">os.mkfifo()</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">mkfifo</span></code> command is hashed while an <code class="docutils literal notranslate"><span class="pre">os.mkfifo()</span></code> is not.</p></li>
+<li><p>Keep your steps as flexible as possible.
+You don’t know what other user might need, so let them decide.</p></li>
+</ul>
+<div class="section" id="usage-of-dd-and-mkfifo">
+<h3>Usage of <code class="docutils literal notranslate"><span class="pre">dd</span></code> and <code class="docutils literal notranslate"><span class="pre">mkfifo</span></code><a class="headerlink" href="#usage-of-dd-and-mkfifo" title="Permalink to this headline">¶</a></h3>
+<p><strong>uap</strong> relies often on <code class="docutils literal notranslate"><span class="pre">dd</span></code> and FIFOs to process data with fewer
+disk read-write operations.
+Please provide a step option to adjust the <code class="docutils literal notranslate"><span class="pre">dd</span></code> blocksize (this option
+is usually called <code class="docutils literal notranslate"><span class="pre">dd-blocksize</span></code>).
+Create your steps in a way that they perform the least filesystem operations.
+Some systems might be very sensitive to huge numbers of read-write operations.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="platforms.html" class="btn btn-neutral float-right" title="Tested Platforms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="interaction.html" class="btn btn-neutral float-left" title="Command-Line Usage of uap" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christoph Kämpf, Michael Specht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

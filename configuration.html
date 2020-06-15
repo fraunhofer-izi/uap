@@ -1,0 +1,793 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuration of uap &mdash; uap 2.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Command-Line Usage of uap" href="interaction.html" />
+    <link rel="prev" title="Installation of uap" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> uap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introducing <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#software-design">Software Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#recommended-uap-workflow">Recommended <strong>uap</strong> Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to.html">Quick Start <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of <strong>uap</strong></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Analysis Configuration File</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sections-of-a-configuration-file">Sections of a Configuration File</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#destination-path-section"><code class="docutils literal notranslate"><span class="pre">destination_path</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#base-working-directory-section"><code class="docutils literal notranslate"><span class="pre">base_working_directory</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#constants-section"><code class="docutils literal notranslate"><span class="pre">constants</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#steps-section"><code class="docutils literal notranslate"><span class="pre">steps</span></code> Section</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#source-steps">Source Steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#processing-steps">Processing Steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reserved-keywords-for-steps">Reserved Keywords for Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tools-section"><code class="docutils literal notranslate"><span class="pre">tools</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lmod-section"><code class="docutils literal notranslate"><span class="pre">lmod</span></code> Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cluster-section"><code class="docutils literal notranslate"><span class="pre">cluster</span></code> Section</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#example-configurations">Example Configurations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#cluster-configuration-file">Cluster Configuration File</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submit-script-template">Submit Script Template</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="interaction.html">Command-Line Usage of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="extension.html">Add New Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Tested Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annotation.html">Annotation Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="steps.html">Available steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Information for uap Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">uap</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Configuration of uap</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/configuration.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="analysis-configuration-file">
+<span id="analysis-configuration"></span><h1>Analysis Configuration File<a class="headerlink" href="#analysis-configuration-file" title="Permalink to this headline">¶</a></h1>
+<p><strong>uap</strong> requires a <a href="http://www.yaml.org/" target="_blank">YAML</a> file which contains all information
+about the data analysis.
+These files are called configuration files.</p>
+<p>A configuration file describes a complete analysis.
+Configurations consist of four sections (let’s just call them sections,
+although technically, they are keys):</p>
+<p><strong>Mandatory Sections</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">destination_path</span></code> – points to the directory where the result files,
+annotations and temporary files are written to</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">constants</span></code> – defines constants for later use (define repeatedly used
+values as constants to increase readability of the following sections)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">steps</span></code> – defines the source and processing steps and their order</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lmod</span></code> – if lmod is used paths can be specified here to ignor user env</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tools</span></code> – defines all tools used in the analysis and how to determine
+their versions (for later reference)</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Optional Sections</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cluster</span></code> – if <strong>uap</strong> is required to run on a HPC cluster some default
+parameters can be set her</p></li>
+</ul>
+</div></blockquote>
+<p>Please refer to the <a href="http://www.yaml.org/" target="_blank">YAML</a> definition for the correct notation used in
+that file.</p>
+<div class="section" id="sections-of-a-configuration-file">
+<h2>Sections of a Configuration File<a class="headerlink" href="#sections-of-a-configuration-file" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="destination-path-section">
+<span id="config-file-destination-path"></span><h3><code class="docutils literal notranslate"><span class="pre">destination_path</span></code> Section<a class="headerlink" href="#destination-path-section" title="Permalink to this headline">¶</a></h3>
+<p>The value of <code class="docutils literal notranslate"><span class="pre">destination_path</span></code> is the directory where <strong>uap</strong> is going
+to store the created files.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">destination_path</span><span class="p">:</span> <span class="s">&quot;/path/to/workflow/output&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="base-working-directory-section">
+<h3><code class="docutils literal notranslate"><span class="pre">base_working_directory</span></code> Section<a class="headerlink" href="#base-working-directory-section" title="Permalink to this headline">¶</a></h3>
+<p>The value of <code class="docutils literal notranslate"><span class="pre">base_working_directory</span></code> is the directory where <strong>uap</strong>
+changes to before declaring all steps and it defaults to the location
+of the configuration file. All configured paths can be set relatively
+to this directory.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">base_working_directory</span><span class="p">:</span> <span class="s">&quot;/path/to/workflow/output&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="constants-section">
+<h3><code class="docutils literal notranslate"><span class="pre">constants</span></code> Section<a class="headerlink" href="#constants-section" title="Permalink to this headline">¶</a></h3>
+<p>This section is the place where repeatedly used constants should be defined.
+For instance absolute paths to the genome index files can be defined as
+constant.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nl">&amp;genome_faidx</span>
+     <span class="l l-Scalar l-Scalar-Plain">genomes/animalia/chordata/mammalia/primates/homo_sapiens/hg19/samtools_faidx/hg19_all_chr_UCSC-download-B7ceRp9K/hg19_all_chr_UCSC-download.fasta.fai</span>
+</pre></div>
+</div>
+<p>Later on the value can be reused by typing <code class="docutils literal notranslate"><span class="pre">*genome_faidx</span></code>.
+<strong>There are no restrictions about what can be defined here.</strong></p>
+</div>
+<div class="section" id="steps-section">
+<span id="config-file-steps"></span><h3><code class="docutils literal notranslate"><span class="pre">steps</span></code> Section<a class="headerlink" href="#steps-section" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">steps</span></code> section is the core of the analysis file, because it defines when
+steps are executed and how they depend on each other.
+All available steps are described in detail in the steps documentation:
+<a class="reference internal" href="steps.html"><span class="doc">Available steps</span></a>.
+The <code class="docutils literal notranslate"><span class="pre">steps</span></code> section contains an entry (technically a key) for every step.
+Every step name <strong>must</strong> be unique.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please be aware that the <a href="http://pyyaml.org/ticket/128" target="_blank">PyYAML</a>, the YAML parser used by uap, does not
+complain about keys with the same name.
+But drops one of the duplicates without giving an error.</p>
+</div>
+<p>There are two ways to name a step to allow multiple steps of the same type and
+still ensure unique naming:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+    <span class="c1"># here, the step name is unchanged, it&#39;s a cutadapt step which is also</span>
+    <span class="c1"># called &#39;cutadapt&#39;</span>
+    <span class="nt">cutadapt</span><span class="p">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">...</span> <span class="c1"># options following</span>
+
+    <span class="c1"># here, we also insert a cutadapt step, but we give it a different name:</span>
+    <span class="c1"># &#39;clip_adapters&#39;</span>
+    <span class="nt">clip_adapters (cutadapt)</span><span class="p">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">...</span> <span class="c1"># options following</span>
+</pre></div>
+</div>
+<p>Now let’s have a look at the two different types of steps which constitute
+an <strong>uap</strong> analaysis.</p>
+<div class="section" id="source-steps">
+<span id="config-file-source-steps"></span><h4>Source Steps<a class="headerlink" href="#source-steps" title="Permalink to this headline">¶</a></h4>
+<p>Source steps are the only steps which are allowed to use or create data
+outside the <code class="docutils literal notranslate"><span class="pre">destination_path</span></code>.
+Feature of source steps:</p>
+<ul class="simple">
+<li><p>they provide the input files for the following steps</p></li>
+<li><p>they can start processes e.g. to download files or demultiplex reads</p></li>
+<li><p>they do not depend on previous steps</p></li>
+<li><p>they are the root nodes of the analysis graph</p></li>
+</ul>
+<p>If you want to work with fastq files, you should use the <code class="docutils literal notranslate"><span class="pre">fastq_source</span></code>
+step to import the required files.
+Such a step definition would look like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+    <span class="nt">input_step (fastq_source)</span><span class="p">:</span>
+    <span class="nt">pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/Path/to/fastq-files/*.gz</span>
+    <span class="nt">group</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">([SL]\w+)_R[12]-00[12].fastq.gz</span>
+    <span class="nt">sample_id_prefix</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MyPrefix</span>
+    <span class="nt">first_read</span><span class="p">:</span> <span class="s">&#39;_R1&#39;</span>
+    <span class="nt">second_read</span><span class="p">:</span> <span class="s">&#39;_R2&#39;</span>
+    <span class="nt">paired_end</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+</pre></div>
+</div>
+<p>The options of the <code class="docutils literal notranslate"><span class="pre">fastq_source</span></code> step are described at <a class="reference internal" href="steps.html"><span class="doc">Available steps</span></a>.
+The <code class="docutils literal notranslate"><span class="pre">group</span></code> option takes a regular expression (regexp).
+You can test your regular expression at <a href="http://pythex.org" target="_blank">pythex.org</a>.</p>
+</div>
+<div class="section" id="processing-steps">
+<span id="config-file-processing-steps"></span><h4>Processing Steps<a class="headerlink" href="#processing-steps" title="Permalink to this headline">¶</a></h4>
+<p>Processing steps depend upon one or more preceding steps.
+They use their output files and process them.
+Output files of processing steps are automatically named and saved by <strong>uap</strong>.
+A complete list of available options per step can be found at <a class="reference internal" href="steps.html"><span class="doc">Available steps</span></a>
+or by using the <a class="reference internal" href="interaction.html#uap-steps"><span class="std std-ref">steps Subcommand</span></a>.</p>
+</div>
+<div class="section" id="reserved-keywords-for-steps">
+<span id="config-file-keywords"></span><h4>Reserved Keywords for Steps<a class="headerlink" href="#reserved-keywords-for-steps" title="Permalink to this headline">¶</a></h4>
+<p id="config-file-depends"><strong>_depends:</strong></p>
+<blockquote>
+<div><p>Dependencies are defined via the <code class="docutils literal notranslate"><span class="pre">_depends</span></code> key which may either be <code class="docutils literal notranslate"><span class="pre">null</span></code>,
+a step name, or a list of step names.</p>
+</div></blockquote>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+    <span class="c1"># the source step which depends on nothing</span>
+    <span class="nt">fastq_source</span><span class="p">:</span>
+        <span class="c1"># ...</span>
+
+    <span class="nt">run_folder_source</span><span class="p">:</span>
+        <span class="c1"># ...</span>
+
+    <span class="c1"># the first processing step, which depends on the source step</span>
+    <span class="nt">cutadapt</span><span class="p">:</span>
+        <span class="nt">_depends</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">fastq_source</span><span class="p p-Indicator">,</span> <span class="nv">run_folder_source</span><span class="p p-Indicator">]</span>
+
+    <span class="c1"># the second processing step, which depends on the cutadapt step</span>
+    <span class="nt">fix_cutadapt</span><span class="p">:</span>
+        <span class="nt">_depends</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cutadapt</span>
+</pre></div>
+</div>
+<p id="config-file-connect"><strong>_connect:</strong></p>
+<blockquote>
+<div><p>Normally steps connected with <code class="docutils literal notranslate"><span class="pre">_depends</span></code> do pass data along by defining
+so called connections.
+If the name of an output connection matches the name of an input connection
+of a succeeding step the data gets passed on automatically.
+But, sometimes the user wants to force the connection of differently named
+connections.
+This can be done with the <code class="docutils literal notranslate"><span class="pre">_connect</span></code> keyword.
+A common usage is to connect downloaded data with a
+<a class="reference internal" href="#config-file-processing-steps"><span class="std std-ref">Processing Steps</span></a>.</p>
+</div></blockquote>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span>  <span class="nt">steps</span><span class="p">:</span>
+      <span class="c1"># Source step to download i.e. sequence of chr1 of some species</span>
+      <span class="nt">chr1 (raw_url_source)</span><span class="p">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">...</span>
+
+      <span class="c1"># Download chr2 sequence</span>
+      <span class="nt">chr2 (raw_url_source)</span><span class="p">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">...</span>
+
+      <span class="nt">merge_fasta_files</span><span class="p">:</span>
+          <span class="nt">_connect</span><span class="p">:</span>
+              <span class="nt">in/sequence</span><span class="p">:</span>
+                  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">chr1/raw</span>
+                  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">chr2/raw</span>
+          <span class="c1"># Equivalent to:</span>
+          <span class="c1"># _connect:</span>
+          <span class="c1">#     in/sequence: [chr1/raw, chr2/raw]</span>
+
+<span class="l l-Scalar l-Scalar-Plain">The examples shows how the ``raw_url_source`` output connection ``raw`` is</span>
+<span class="l l-Scalar l-Scalar-Plain">connected to the input connection ``sequence`` of the ``merge_fasta_files``</span>
+<span class="l l-Scalar l-Scalar-Plain">step.</span>
+</pre></div>
+</div>
+<p id="config-file-break"><strong>_BREAK:</strong></p>
+<blockquote>
+<div><p>If you want to cut off entire branches of the step graph, set the <code class="docutils literal notranslate"><span class="pre">_BREAK</span></code>
+flag in a step definition, which will force the step to produce no runs
+(which will in turn give all following steps nothing to do, thereby
+effectively disabling these steps):</p>
+</div></blockquote>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+    <span class="nt">fastq_source</span><span class="p">:</span>
+        <span class="c1"># ...</span>
+
+    <span class="nt">cutadapt</span><span class="p">:</span>
+        <span class="nt">_depends</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fastq_source</span>
+
+    <span class="c1"># this step and all following steps will not be executed</span>
+    <span class="nt">fix_cutadapt</span><span class="p">:</span>
+        <span class="nt">_depends</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cutadapt</span>
+        <span class="nt">_BREAK</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+<p id="config-file-volatile"><strong>_volatile:</strong></p>
+<blockquote>
+<div><p>Steps can be marked with <code class="docutils literal notranslate"><span class="pre">_volatile:</span> <span class="pre">yes</span></code>.
+This flag tells <strong>uap</strong> that the output files of the marked step are only
+intermediate results.</p>
+</div></blockquote>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+    <span class="c1"># the source step which depends on nothing</span>
+    <span class="nt">fastq_source</span><span class="p">:</span>
+        <span class="c1"># ...</span>
+
+    <span class="c1"># this steps output can be deleted if all depending steps are finished</span>
+    <span class="nt">cutadapt</span><span class="p">:</span>
+        <span class="nt">_depends</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fastq_source</span>
+        <span class="nt">_volatile</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+        <span class="c1"># same as:</span>
+        <span class="c1"># _volatile: True</span>
+
+    <span class="c1"># if fix_cutadapt is finished the output files of cutadapt can be</span>
+    <span class="c1"># volatilized</span>
+    <span class="nt">fix_cutadapt</span><span class="p">:</span>
+        <span class="nt">_depends</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cutadapt</span>
+</pre></div>
+</div>
+<p>If all steps depending on the intermediate step are finished <strong>uap</strong> tells the
+user that he can free disk space.
+The message is output if the <a class="reference internal" href="interaction.html#uap-status"><span class="std std-ref">status</span></a> is checked and looks
+like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Hint</span><span class="p">:</span> <span class="n">You</span> <span class="n">could</span> <span class="n">save</span> <span class="mf">156.9</span> <span class="n">GB</span> <span class="n">of</span> <span class="n">disk</span> <span class="n">space</span> <span class="n">by</span> <span class="n">volatilizing</span> <span class="mi">104</span> <span class="n">output</span> <span class="n">files</span><span class="o">.</span>
+<span class="n">Call</span> <span class="s1">&#39;uap &lt;project-config&gt;.yaml volatilize --srsly&#39;</span> <span class="n">to</span> <span class="n">purge</span> <span class="n">the</span> <span class="n">files</span><span class="o">.</span>
+</pre></div>
+</div>
+<p><strong>uap</strong> is going to replace the output files by placeholder files if the user
+executes the <a class="reference internal" href="interaction.html#uap-volatilize"><span class="std std-ref">volatilize</span></a> command.</p>
+<p id="config-file-cluster-submit-options"><strong>_cluster_submit_options</strong></p>
+<blockquote>
+<div><p>This string contains the entire submit options which will be set in the
+submit script.
+This option allows to overwrite the values set in
+<a class="reference internal" href="#config-file-default-submit-options"><span class="std std-ref">default_submit_options</span></a>.</p>
+</div></blockquote>
+<p id="config-file-cluster-pre-job-command"><strong>_cluster_pre_job_command</strong></p>
+<blockquote>
+<div><p>This string contains command(s) that are executed <strong>BEFORE uap</strong> is started
+on the cluster.
+This option allows to overwrite the values set in
+<a class="reference internal" href="#config-file-default-pre-job-command"><span class="std std-ref">default_pre_job_command</span></a>.</p>
+</div></blockquote>
+<p id="config-file-cluster-post-job-command"><strong>_cluster_post_job_command</strong></p>
+<blockquote>
+<div><p>This string contains command(s) that are executed <strong>AFTER uap</strong> did finish
+on the cluster.
+This option allows to overwrite the values set in
+<a class="reference internal" href="#config-file-default-post-job-command"><span class="std std-ref">default_post_job_command</span></a>.</p>
+</div></blockquote>
+<p id="config-file-cluster-job-quota"><strong>_cluster_job_quota</strong></p>
+<blockquote>
+<div><p>This option defines the number of jobs of the same type that can
+run simultaneously on a cluster.
+This option allows to overwrite the values set in
+<a class="reference internal" href="#config-file-default-job-quota"><span class="std std-ref">default_job_quota</span></a>.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="tools-section">
+<span id="config-file-tools"></span><h3><code class="docutils literal notranslate"><span class="pre">tools</span></code> Section<a class="headerlink" href="#tools-section" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">tools</span></code> section lists all programs required for the execution of a
+particular analysis.
+An example tool configuration looks like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">tools</span><span class="p">:</span>
+
+     <span class="c1"># you don&#39;t have to specify a path if the tool can be found in $PATH</span>
+     <span class="nt">cat</span><span class="p">:</span>
+         <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cat</span>
+         <span class="nt">get_version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">--version</span>
+
+     <span class="c1"># you have to specify a path if the tool can not be found in $PATH</span>
+     <span class="nt">some-tool</span><span class="p">:</span>
+         <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/some-tool</span>
+         <span class="nt">get_version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">--version</span>
+
+    <span class="c1"># if the output is not sesetive to the tool version it can be ignored</span>
+<span class=" -Error">    </span><span class="nt">mv</span><span class="p">:</span>
+       <span class="nt">ignore_version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+
+    <span class="nt">pigz</span><span class="p">:</span>
+        <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">pigz</span>
+        <span class="nt">get_version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">--version</span>
+        <span class="nt">exit_code</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+</pre></div>
+</div>
+<p><strong>uap</strong> uses the <code class="docutils literal notranslate"><span class="pre">path</span></code>, <code class="docutils literal notranslate"><span class="pre">get_version</span></code>, and <code class="docutils literal notranslate"><span class="pre">exit_code</span></code> information to
+control the availability of a tool.
+This is particularly useful on cluster systems were software can be dynamically
+loaded and unloaded.
+<strong>uap</strong> logs the version of every used tool.
+If <code class="docutils literal notranslate"><span class="pre">get_version</span></code> and <code class="docutils literal notranslate"><span class="pre">exit_code</span></code> is not set, <strong>uap</strong> tries to determine the
+version by calling the program without command-line arguments.
+<code class="docutils literal notranslate"><span class="pre">get_version</span></code> is the command line argument (e.g. <code class="docutils literal notranslate"><span class="pre">--version</span></code>) required to
+get the version information.
+<code class="docutils literal notranslate"><span class="pre">exit_code</span></code> is the value returned by <code class="docutils literal notranslate"><span class="pre">echo</span> <span class="pre">$?</span></code> after trying to determine
+the version e.g. by running <code class="docutils literal notranslate"><span class="pre">pigz</span> <span class="pre">--version</span></code>.
+If not set <code class="docutils literal notranslate"><span class="pre">exit_code</span></code> defaults to 0, <code class="docutils literal notranslate"><span class="pre">get_version</span></code> to <code class="docutils literal notranslate"><span class="pre">--version</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ignore_version</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code> and <code class="docutils literal notranslate"><span class="pre">path</span></code> to the tool name.</p>
+<p>Some tools are configured by default. Theire configuration will be logged
+in the result annotation but they do not have to be made explicitly in the
+configuration yaml. These are tools that come with the UAP installation
+in <code class="docutils literal notranslate"><span class="pre">&lt;UAP</span> <span class="pre">path&gt;/tools</span></code> and these <a href="https://www.gnu.org/software/coreutils/manual/coreutils.html" target="_blank">GNU Core Utilities</a>: basename, cat, cp, cut, date,
+dd, dirname, du, head, ln, ls, mkdir, mkfifo, mv, paste, printf, pwd, seq,
+sleep, sort, rm, tail, tee, tr, uniq, wc. The <code class="docutils literal notranslate"><span class="pre">ignore_version</span></code> of these
+<a href="https://www.gnu.org/software/coreutils/manual/coreutils.html" target="_blank">GNU Core Utilities</a> defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>To use <a href="https://lmod.readthedocs.io/en/latest/" target="_blank">lmod</a> to load an unload a tool you can specify the
+<code class="docutils literal notranslate"><span class="pre">module_name</span></code> option:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">tools</span><span class="p">:</span>
+
+    <span class="nt">pigz</span><span class="p">:</span>
+        <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">pigz</span>
+        <span class="nt">get_version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">--version</span>
+        <span class="nt">exit_code</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+        <span class="nt">module_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">pigz/version</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="lmod-section">
+<span id="config-file-lmod"></span><h3><code class="docutils literal notranslate"><span class="pre">lmod</span></code> Section<a class="headerlink" href="#lmod-section" title="Permalink to this headline">¶</a></h3>
+<p>This section is optional and specifies the <a href="https://lmod.readthedocs.io/en/latest/" target="_blank">lmod</a> utility. It is
+only required if <a href="https://lmod.readthedocs.io/en/latest/" target="_blank">lmod</a> is not loaded and <code class="docutils literal notranslate"><span class="pre">module_name</span></code> is
+used in the <code class="docutils literal notranslate"><span class="pre">tools</span></code> section.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">lmod</span><span class="p">:</span>
+    <span class="nt">path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/lmod/executable</span>
+    <span class="nt">module_path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/colon/seperated/paths/to/the/used/modules</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">path</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">$LMOD_CMD</span></code> and <code class="docutils literal notranslate"><span class="pre">module_path</span></code> to <code class="docutils literal notranslate"><span class="pre">$MODULEPATH</span></code>
+of the user environment.</p>
+</div>
+<div class="section" id="cluster-section">
+<span id="config-file-cluster"></span><h3><code class="docutils literal notranslate"><span class="pre">cluster</span></code> Section<a class="headerlink" href="#cluster-section" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">cluster</span></code> section is required only if the analysis is executed on a
+system using a cluster engine like <a href="http://www.univa.com/products/" target="_blank">UGE</a> or <a href="http://slurm.schedmd.com/" target="_blank">SLURM</a>.
+This section interacts tightly with the
+An example <code class="docutils literal notranslate"><span class="pre">cluster</span></code> section looks like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">cluster</span><span class="p">:</span>
+    <span class="nt">default_submit_options</span><span class="p">:</span> <span class="s">&quot;-pe</span><span class="nv"> </span><span class="s">smp</span><span class="nv"> </span><span class="s">#{CORES}</span><span class="nv"> </span><span class="s">-cwd</span><span class="nv"> </span><span class="s">-S</span><span class="nv"> </span><span class="s">/bin/bash</span><span class="nv"> </span><span class="s">-m</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">-M</span><span class="nv"> </span><span class="s">me@example.com</span><span class="nv"> </span><span class="s">-l</span><span class="nv"> </span><span class="s">h_rt=1:00:00</span><span class="nv"> </span><span class="s">-l</span><span class="nv"> </span><span class="s">h_vmem=2G&quot;</span>
+    <span class="nt">default_pre_job_command</span><span class="p">:</span> <span class="s">&quot;echo</span><span class="nv"> </span><span class="s">&#39;Started</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">run!&#39;&quot;</span>
+    <span class="nt">default_post_job_command</span><span class="p">:</span> <span class="s">&quot;echo</span><span class="nv"> </span><span class="s">&#39;Finished</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">run!&#39;&quot;</span>
+    <span class="nt">default_job_quota</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+</pre></div>
+</div>
+<p id="config-file-default-submit-options"><strong>default_submit_options</strong></p>
+<blockquote>
+<div><p>This is the default submit options string which replaces the
+<a class="reference internal" href="#submit-template-submit-options"><span class="std std-ref">#{SUBMIT_OPTIONS}</span></a> placeholder in
+the <a class="reference internal" href="#submit-template"><span class="std std-ref">submit script template</span></a>.
+It is <strong>mandatory</strong> to set this value.</p>
+</div></blockquote>
+<p id="config-file-default-pre-job-command"><strong>default_pre_job_command</strong></p>
+<blockquote>
+<div><p>This string contains the default commands which will be executed
+<strong>BEFORE uap</strong> is started on the cluster.
+It will replace the
+<a class="reference internal" href="#submit-template-pre-job-command"><span class="std std-ref">#{PRE_JOB_COMMAND}</span></a> placeholder in
+the <a class="reference internal" href="#submit-template"><span class="std std-ref">submit script template</span></a>.
+If mutliple commands shall be executed separate those with <code class="docutils literal notranslate"><span class="pre">\n</span></code>.
+It is <strong>optional</strong> to set this value.</p>
+</div></blockquote>
+<p id="config-file-default-post-job-command"><strong>default_post_job_command</strong></p>
+<blockquote>
+<div><p>This string contains the default commands which will be executed
+<strong>AFTER uap</strong> is started on the cluster.
+It will replace the
+<a class="reference internal" href="#submit-template-post-job-command"><span class="std std-ref">#{POST_JOB_COMMAND}</span></a> placeholder in
+the <a class="reference internal" href="#submit-template"><span class="std std-ref">submit script template</span></a>.
+If mutliple commands shall be executed separate those with <code class="docutils literal notranslate"><span class="pre">\n</span></code>.
+It is <strong>optional</strong> to set this value.</p>
+</div></blockquote>
+<p id="config-file-default-job-quota"><strong>default_job_quota:</strong></p>
+<blockquote>
+<div><p>This option defines the number of jobs of the same type that can
+run simultaneously on a cluster.
+A value <em>0</em> means no limit is applied.
+It is <strong>optional</strong> to set this value, if the value is not provided it
+defaults to <em>0</em>.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="example-configurations">
+<h2>Example Configurations<a class="headerlink" href="#example-configurations" title="Permalink to this headline">¶</a></h2>
+<p>Example configurations can be found in <strong>uap</strong>’s <code class="docutils literal notranslate"><span class="pre">example-configurations</span></code>
+folder.
+More information about these examples can be found in <a class="reference internal" href="how-to.html"><span class="doc">Quick Start uap</span></a>.</p>
+</div>
+</div>
+<div class="section" id="cluster-configuration-file">
+<span id="cluster-configuration"></span><h1>Cluster Configuration File<a class="headerlink" href="#cluster-configuration-file" title="Permalink to this headline">¶</a></h1>
+<p>The cluster configuration file resides at:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ls -la $(dirname $(which uap))/cluster/cluster-specific-commands.yaml
+</pre></div>
+</div>
+<p>This YAML file contains a dictionary for every cluster type.
+An example file is shown here:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configuration for a UGE cluster engine</span>
+<span class="nt">uge</span><span class="p">:</span>
+    <span class="c1"># Command to get version information</span>
+    <span class="nt">identity_test</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;qstat&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;-help&#39;</span><span class="p p-Indicator">]</span>
+    <span class="c1"># The expected output of identity_test for this cluster engine</span>
+    <span class="nt">identity_answer</span><span class="p">:</span> <span class="s">&#39;UGE&#39;</span>
+    <span class="c1"># Command to submit job</span>
+    <span class="nt">submit</span><span class="p">:</span> <span class="s">&#39;qsub&#39;</span>
+    <span class="c1"># Command to check job status</span>
+    <span class="nt">stat</span><span class="p">:</span> <span class="s">&#39;qstat&#39;</span>
+    <span class="c1"># Relative path to submit script template</span>
+    <span class="c1"># The path has to be relative to:</span>
+    <span class="c1"># $ dirname $(which uap)</span>
+    <span class="nt">template</span><span class="p">:</span> <span class="s">&#39;cluster/submit-scripts/qsub-template.sh&#39;</span>
+    <span class="c1"># way to define job dependencies</span>
+    <span class="nt">hold_jid</span><span class="p">:</span> <span class="s">&#39;-hold_jid&#39;</span>
+    <span class="c1"># Separator for job dependencies</span>
+    <span class="nt">hold_jid_separator</span><span class="p">:</span> <span class="s">&#39;;&#39;</span>
+    <span class="c1"># Option to set job names</span>
+    <span class="nt">array_job</span><span class="p">:</span> <span class="s">&#39;-t</span><span class="nv"> </span><span class="s">1-%s&#39;</span>
+    <span class="c1"># Option to submit an array job</span>
+    <span class="nt">array_job_wquota</span><span class="p">:</span> <span class="s">&#39;-t</span><span class="nv"> </span><span class="s">1-%s</span><span class="nv"> </span><span class="s">-tc</span><span class="nv"> </span><span class="s">%s&#39;</span>
+    <span class="c1"># Options to submit an array job with a quota</span>
+    <span class="nt">set_job_name</span><span class="p">:</span> <span class="s">&#39;-N&#39;</span>
+    <span class="c1"># Option to set path of stderr file</span>
+    <span class="nt">set_stderr</span><span class="p">:</span> <span class="s">&#39;-e&#39;</span>
+    <span class="c1"># Option to set path of stdout file</span>
+    <span class="nt">set_stdout</span><span class="p">:</span> <span class="s">&#39;-o&#39;</span>
+    <span class="c1"># Regex to extract Job ID after submission</span>
+    <span class="nt">parse_job_id</span><span class="p">:</span> <span class="s">&#39;Your</span><span class="nv"> </span><span class="s">job</span><span class="nv"> </span><span class="s">(\d+)&#39;</span>
+
+<span class="c1"># Configuration for a SLURM cluster engine</span>
+<span class="nt">slurm</span><span class="p">:</span>
+    <span class="nt">identity_test</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;sbatch&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;--version&#39;</span><span class="p p-Indicator">]</span>
+    <span class="nt">identity_answer</span><span class="p">:</span> <span class="s">&#39;slurm&#39;</span>
+    <span class="nt">submit</span><span class="p">:</span> <span class="s">&#39;sbatch&#39;</span>
+    <span class="nt">stat</span><span class="p">:</span> <span class="s">&#39;squeue&#39;</span>
+    <span class="nt">template</span><span class="p">:</span> <span class="s">&#39;cluster/submit-scripts/sbatch-template.sh&#39;</span>
+    <span class="nt">hold_jid</span><span class="p">:</span> <span class="s">&#39;--dependency=afterany:%s&#39;</span>
+    <span class="nt">hold_jid_separator</span><span class="p">:</span> <span class="s">&#39;:&#39;</span>
+    <span class="nt">array_job</span><span class="p">:</span> <span class="s">&#39;--array=1-%s&#39;</span>
+    <span class="nt">array_job_wquota</span><span class="p">:</span> <span class="s">&#39;--array=1-%s%%%s&#39;</span>
+    <span class="nt">set_job_name</span><span class="p">:</span> <span class="s">&#39;--job-name=%s&#39;</span>
+    <span class="nt">set_stderr</span><span class="p">:</span> <span class="s">&#39;-e&#39;</span>
+    <span class="nt">set_stdout</span><span class="p">:</span> <span class="s">&#39;-o&#39;</span>
+    <span class="nt">parse_job_id</span><span class="p">:</span> <span class="s">&#39;Submitted</span><span class="nv"> </span><span class="s">batch</span><span class="nv"> </span><span class="s">job</span><span class="nv"> </span><span class="s">(\d+)&#39;</span>
+</pre></div>
+</div>
+<p>Let’s browse over the options which need to be set per cluster engine:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">identity_test:</span></code></dt><dd><p>Command used to determine if <strong>uap</strong> has been started on a system running
+a cluster engine e.g. <code class="docutils literal notranslate"><span class="pre">sbatch</span> <span class="pre">--version</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">identity_answer:</span></code></dt><dd><p><strong>uap</strong> checks if the output of the <code class="docutils literal notranslate"><span class="pre">identity_test</span></code> command starts with
+this value e.g. <code class="docutils literal notranslate"><span class="pre">slurm</span></code>.
+If that is true the cluster type has been detected.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">submit:</span></code></dt><dd><p>Command to submit a job onto the cluster e.g. <code class="docutils literal notranslate"><span class="pre">sbatch</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stat:</span></code></dt><dd><p>Command to check the status of jobs on the cluster e.g. <code class="docutils literal notranslate"><span class="pre">squeue</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">template:</span></code></dt><dd><p>Path to the submit script template which has to be used for this cluster
+type e.g. <code class="docutils literal notranslate"><span class="pre">cluster/submit-scripts/sbatch-template.sh</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hold_jid:</span></code></dt><dd><p>Option given to the <code class="docutils literal notranslate"><span class="pre">submit</span></code> command to define dependencies between
+jobs e.g. <code class="docutils literal notranslate"><span class="pre">--dependency=afterany:%s</span></code>.
+Placeholder <code class="docutils literal notranslate"><span class="pre">%s</span></code> gets replaced with the jobs this job depends on if
+present.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">hold_jid_separator:</span></code></dt><dd><p>Separator used to concatenate multiple jobs for <code class="docutils literal notranslate"><span class="pre">hold_jid</span></code> e.g. <code class="docutils literal notranslate"><span class="pre">:</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">array_job</span></code>:</dt><dd><p>Option given to the <code class="docutils literal notranslate"><span class="pre">submit</span></code> command to use array jobs e.g.
+<code class="docutils literal notranslate"><span class="pre">--array=1-%s</span></code>.
+<code class="docutils literal notranslate"><span class="pre">%s</span></code> is replaced by the number of jobs.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">array_job_wquota</span></code>:</dt><dd><p>Option given to the <code class="docutils literal notranslate"><span class="pre">submit</span></code> command to use array jobs with quota
+e.g. <code class="docutils literal notranslate"><span class="pre">--array=1-%s%%%s</span></code> (will be <code class="docutils literal notranslate"><span class="pre">--array=1-100%5</span></code> for <em>100</em>
+jobs with a quota of <em>5</em>).
+The first <code class="docutils literal notranslate"><span class="pre">%s</span></code> is replaced by the number of jobs and the second
+<code class="docutils literal notranslate"><span class="pre">%s</span></code> by the quota (if above 0). A literal “%” has to be written
+as <code class="docutils literal notranslate"><span class="pre">%%</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">array_task_id</span></code></dt><dd><p>The name of the environment variable set by the resource manager
+that contains the job array id e.g.
+<code class="docutils literal notranslate"><span class="pre">SLURM_ARRAY_TASK_ID</span></code> or <code class="docutils literal notranslate"><span class="pre">SGE_TASK_ID</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">set_job_name:</span></code></dt><dd><p>Option given to the <code class="docutils literal notranslate"><span class="pre">submit</span></code> command to set the job name e.g.
+<code class="docutils literal notranslate"><span class="pre">--job-name=%s</span></code>.
+<code class="docutils literal notranslate"><span class="pre">%s</span></code> is replaced by the job name if present.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">set_stderr:</span></code></dt><dd><p>Option given to the <code class="docutils literal notranslate"><span class="pre">submit</span></code> command to set the name of the stderr file
+e.g. <code class="docutils literal notranslate"><span class="pre">-e</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">set_stdout:</span></code></dt><dd><p>Option given to the <code class="docutils literal notranslate"><span class="pre">submit</span></code> command to set the name of the stdout file
+e.g. <code class="docutils literal notranslate"><span class="pre">-o</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">parse_job_id:</span></code></dt><dd><p>Python regular expression whose first parenthesized subgroup represents
+the cluster job ID e.g. <code class="docutils literal notranslate"><span class="pre">Submitted</span> <span class="pre">batch</span> <span class="pre">job</span> <span class="pre">(\d+)</span></code>.</p>
+</dd>
+</dl>
+<div class="section" id="submit-script-template">
+<span id="submit-template"></span><h2>Submit Script Template<a class="headerlink" href="#submit-script-template" title="Permalink to this headline">¶</a></h2>
+<p>The submit script template contains a lot of placeholders which are replaced
+if a job is submitted to the cluster with the actual commands.</p>
+<p>The submit script templates reside at:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ls $(dirname $(which uap))/cluster/submit-scripts/*
+qsub-template.sh
+sbatch-template.sh
+</pre></div>
+</div>
+<p>Feel free to add your own templates.
+The templates need to contain the following placeholders:</p>
+<dl class="simple" id="submit-template-submit-options">
+<dt><code class="docutils literal notranslate"><span class="pre">#{SUBMIT_OPTIONS}</span></code></dt><dd><p>Will be replaced with the steps <code class="docutils literal notranslate"><span class="pre">_cluster_submit_options</span></code> value (see
+<span class="xref std std-ref">_cluster_submit_options</span>), if
+present, or the <code class="docutils literal notranslate"><span class="pre">default_submit_options</span></code> value.</p>
+</dd>
+</dl>
+<dl class="simple" id="submit-template-pre-job-command">
+<dt><code class="docutils literal notranslate"><span class="pre">#{PRE_JOB_COMMAND}</span></code></dt><dd><p>Will be replaced with the steps <code class="docutils literal notranslate"><span class="pre">_cluster_pre_job_command</span></code> value (see
+<span class="xref std std-ref">_cluster_pre_job_command</span>), if
+present, or the <code class="docutils literal notranslate"><span class="pre">default_pre_job_command</span></code> value.</p>
+</dd>
+</dl>
+<dl class="simple" id="submit-template-array-jobs">
+<dt><code class="docutils literal notranslate"><span class="pre">#{ARRAY_JOBS}</span></code></dt><dd><p>Will be replaced with a space seperated list of tasks. The resulting array
+will be used in the command for the <code class="docutils literal notranslate"><span class="pre">&lt;run</span> <span class="pre">ID&gt;</span></code> if the submitted job is
+an array job.</p>
+</dd>
+</dl>
+<dl class="simple" id="submit-template-command">
+<dt><code class="docutils literal notranslate"><span class="pre">#{COMMAND}</span></code></dt><dd><p>Will be replaced with <code class="docutils literal notranslate"><span class="pre">uap</span> <span class="pre">&lt;project-config&gt;.yaml</span> <span class="pre">run-locally</span> <span class="pre">&lt;run</span> <span class="pre">ID&gt;</span></code>.</p>
+</dd>
+</dl>
+<dl class="simple" id="submit-template-post-job-command">
+<dt><code class="docutils literal notranslate"><span class="pre">#{POST_JOB_COMMAND}</span></code></dt><dd><p>Will be replaced with the steps <code class="docutils literal notranslate"><span class="pre">_cluster_post_job_command</span></code> value (see
+<span class="xref std std-ref">_cluster_post_job_command</span>), if
+present, or the <code class="docutils literal notranslate"><span class="pre">default_post_job_command</span></code> value.</p>
+</dd>
+</dl>
+<p>The submit script template is required by
+<a class="reference internal" href="interaction.html#uap-submit-to-cluster"><span class="std std-ref">submit-to-cluster</span></a> for job submission to the
+cluster.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="interaction.html" class="btn btn-neutral float-right" title="Command-Line Usage of uap" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation of uap" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christoph Kämpf, Michael Specht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

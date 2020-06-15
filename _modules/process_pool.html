@@ -1,0 +1,1199 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>process_pool &mdash; uap 2.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> uap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introducing <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html#software-design">Software Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html#recommended-uap-workflow">Recommended <strong>uap</strong> Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to.html">Quick Start <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Analysis Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html#cluster-configuration-file">Cluster Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interaction.html">Command-Line Usage of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extension.html">Add New Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platforms.html">Tested Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotation.html">Annotation Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../steps.html">Available steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers.html">Information for uap Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">uap</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>process_pool</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for process_pool</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">psutil</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">misc</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">fcntl</span>
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">uaperrors</span> <span class="kn">import</span> <span class="n">UAPError</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">This module can be used to launch child processes and wait for them.</span>
+<span class="sd">Processes may either run on their own or pipelines can be built with them.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;./include/steps&#39;</span><span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;uap_logger&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TimeoutException"><a class="viewcode-back" href="../api.html#process_pool.TimeoutException">[docs]</a><span class="k">class</span> <span class="nc">TimeoutException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<span class="k">def</span> <span class="nf">timeout_handler</span><span class="p">(</span><span class="n">signum</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3600</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="n">TimeoutException</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">restore_sigpipe_handler</span><span class="p">():</span>
+    <span class="c1"># http://www.chiark.greenend.org.uk/ucgi/~cjwatson/blosxom/2009-07-02-python-sigpipe.html</span>
+    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGPIPE</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIG_DFL</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">setsid</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="ProcessPool"><a class="viewcode-back" href="../api.html#process_pool.ProcessPool">[docs]</a><span class="k">class</span> <span class="nc">ProcessPool</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The process pool provides an environment for launching and monitoring</span>
+<span class="sd">    processes. You can launch any number of unrelated processes plus any number</span>
+<span class="sd">    of pipelines in which several processes are chained together.</span>
+
+<span class="sd">    Use it like this::</span>
+
+<span class="sd">        with process_pool.ProcessPool(self) as pool:</span>
+<span class="sd">            # launch processes or create pipelines here</span>
+
+<span class="sd">    When the scope opened by the *with* statement is left, all processes are</span>
+<span class="sd">    launched and being watched. The process pool then waits until all processes</span>
+<span class="sd">    have finished. You cannot launch a process pool within another process pool,</span>
+<span class="sd">    but you can launch multiple pipeline and independent processes within a</span>
+<span class="sd">    single process pool. Also, you can launch several process pools sequentially.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">TAIL_LENGTH</span> <span class="o">=</span> <span class="mi">1024</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Size of the tail which gets recorded from both *stdout* and *stderr* streams</span>
+<span class="sd">    of every process launched with this class, in bytes.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">COPY_BLOCK_SIZE</span> <span class="o">=</span> <span class="mi">4194304</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    When *stdout* or *stderr* streams should be written to output files, this is</span>
+<span class="sd">    the buffer size which is used for writing.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">SIGTERM_TIMEOUT</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    After a SIGTERM signal is issued, wait this many seconds before going postal.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">process_watcher_pid</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">current_instance</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">process_pool_is_dead</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># signal names for numbers... kudos to</span>
+    <span class="c1"># http://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python</span>
+    <span class="n">SIGNAL_NAMES</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="nb">getattr</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span>
+        <span class="n">signal</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;SIG&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;_&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">n</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProcessPool.Pipeline"><a class="viewcode-back" href="../api.html#process_pool.ProcessPool.Pipeline">[docs]</a>    <span class="k">class</span> <span class="nc">Pipeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This class can be used to chain multiple processes together.</span>
+
+<span class="sd">        Use it like this::</span>
+
+<span class="sd">            with pool.Pipeline(pool) as pipeline:</span>
+<span class="sd">                # append processes to the pipeline here</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">):</span>
+            <span class="n">pool</span><span class="o">.</span><span class="n">launch_calls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append_calls</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+<div class="viewcode-block" id="ProcessPool.Pipeline.append"><a class="viewcode-back" href="../api.html#process_pool.ProcessPool.Pipeline.append">[docs]</a>        <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">stdout_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stderr_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hints</span><span class="o">=</span><span class="p">{}):</span>
+            <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Append a process to the pipeline. Parameters get stored and are passed</span>
+<span class="sd">            to *ProcessPool.launch()* later, so the same behaviour applies.</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="n">call</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
+                <span class="s1">&#39;stdout_path&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">stdout_path</span><span class="p">),</span>
+                <span class="s1">&#39;stderr_path&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">stderr_path</span><span class="p">),</span>
+                <span class="s1">&#39;hints&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">hints</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append_calls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">call</span><span class="p">)</span></div></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">process_pool_is_dead</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;We have encountered an error, stopping now...&quot;</span><span class="p">)</span>
+        <span class="c1"># the run for which this ProcessPool computes stuff</span>
+        <span class="c1"># (for temporary paths etc.)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run</span> <span class="o">=</span> <span class="n">run</span>
+
+        <span class="c1"># log entries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_entries</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># dict of PID -&gt; path to copy process report</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_process_reports</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># set of currently running PIDs</span>
+        <span class="c1"># whenever a child process exits, its PID will get removed from this</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">running_procs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="c1"># list of PIDs in the order that processes were launched</span>
+        <span class="c1"># whenever a child process exits, its PID will remain in here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proc_order</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># we must keep Popen objects around, or their destructor will be called</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">popen_procs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># dict of PID -&gt; process info</span>
+        <span class="c1"># whenever a child process exits, its PID will remain in here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_watcher_report</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="c1"># list of temp paths to clean up</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># list of commands to be launched</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">launch_calls</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># List of processes we killed deliberately. Look: every time a</span>
+        <span class="c1"># within a pipeline exits, we SIGTERM its predecessor. This is</span>
+        <span class="c1"># necessary because otherwise, stuff is hanging forever.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ok_to_fail</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_processes_for_pid</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_up</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">clean_up_temp_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_up</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">get_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run</span>
+
+    <span class="k">def</span> <span class="nf">check_subprocess_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="n">command</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argument</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                    <span class="s2">&quot;The command to be launched &#39;</span><span class="si">%s</span><span class="s2">&#39; &quot;</span> <span class="o">%</span> <span class="n">command</span> <span class="o">+</span>
+                    <span class="s2">&quot;contains non-string argument &#39;</span><span class="si">%s</span><span class="s2">&#39;. &quot;</span> <span class="o">%</span> <span class="n">argument</span> <span class="o">+</span>
+                    <span class="s2">&quot;Therefore the command will fail. Please &quot;</span> <span class="o">+</span>
+                    <span class="s2">&quot;fix this type issue.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">load_unload_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_cmd</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">module_cmd</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">module_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">module_cmd</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">module_cmd</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">command</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_subprocess_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                    <span class="n">command</span><span class="p">,</span>
+                    <span class="n">stdin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="n">close_fds</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Error while executing &#39;</span><span class="si">%s</span><span class="s2">&#39; &quot;</span>
+                               <span class="s2">&quot;Error no.: </span><span class="si">%s</span><span class="s2"> Error message: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                               <span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">),</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">strerror</span><span class="p">))</span>
+
+            <span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+            <span class="n">exec</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">launch_pre_post_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commands</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">commands</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">commands</span> <span class="o">=</span> <span class="p">[</span><span class="n">commands</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">command</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">current_instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s2">&quot;Sorry, only one instance of ProcessPool allowed at &quot;</span>
+                <span class="s2">&quot;a time.&quot;</span><span class="p">)</span>
+        <span class="n">ProcessPool</span><span class="o">.</span><span class="n">current_instance</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="c1"># First we have to add the pre_command commands for execution</span>
+        <span class="n">pre_commands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_pre_commands</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pre_commands</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">launch_pre_post_command</span><span class="p">(</span><span class="n">pre_commands</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="c1"># Lastly we have to add the post_command commands for execution</span>
+        <span class="n">post_commands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_post_commands</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">post_commands</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">launch_pre_post_command</span><span class="p">(</span><span class="n">post_commands</span><span class="p">)</span>
+
+        <span class="c1"># before everything is launched load the necessary modules</span>
+        <span class="n">module_loads</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_module_loads</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">module_loads</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">module_load</span> <span class="ow">in</span> <span class="n">module_loads</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_unload_module</span><span class="p">(</span><span class="n">module_load</span><span class="p">)</span>
+
+        <span class="c1"># now launch all processes...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_launch_all_processes</span><span class="p">()</span>
+
+        <span class="c1"># ...and wait until all child processes have exited</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wait</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="c1"># pass log to step even if there was a problem</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">append_pipeline_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_log</span><span class="p">())</span>
+            <span class="k">raise</span>
+
+        <span class="c1"># if there was no exception, still pass log to step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">append_pipeline_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_log</span><span class="p">())</span>
+
+        <span class="c1"># after finishing gracefully unload modules</span>
+        <span class="n">module_unloads</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">get_step</span><span class="p">()</span><span class="o">.</span><span class="n">get_module_unloads</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">module_unloads</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">module_unload</span> <span class="ow">in</span> <span class="n">module_unloads</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_unload_module</span><span class="p">(</span><span class="n">module_unload</span><span class="p">)</span>
+
+        <span class="c1"># remove all temporary files or directories we know of</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_up</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">remove_temporary_paths</span><span class="p">()</span>
+
+        <span class="n">ProcessPool</span><span class="o">.</span><span class="n">current_instance</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ProcessPool.launch"><a class="viewcode-back" href="../api.html#process_pool.ProcessPool.launch">[docs]</a>    <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">stdout_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stderr_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hints</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Launch a process. Arguments, including the program itself, are passed in</span>
+<span class="sd">        *args*. If the program is not a binary but a script which cannot be</span>
+<span class="sd">        invoked directly from the command line, the first element of *args* must</span>
+<span class="sd">        be a list like this: *[&#39;python&#39;, &#39;script.py&#39;]*.</span>
+
+<span class="sd">        Use *stdout_path* and *stderr_path* to redirect *stdout* and *stderr*</span>
+<span class="sd">        streams to files. In any case, the output of both streams gets watched,</span>
+<span class="sd">        the process pool calculates SHA256 checksums automatically and also keeps</span>
+<span class="sd">        the last 1024 bytes of every stream. This may be useful if a process</span>
+<span class="sd">        crashes and writes error messages to *stderr* in which case you can see</span>
+<span class="sd">        them even if you didn&#39;t redirect *stderr* to a log file.</span>
+
+<span class="sd">        Hints can be specified but are not essential. They help to determine the</span>
+<span class="sd">        direction of arrows for the run annotation graphs rendered by GraphViz</span>
+<span class="sd">        (sometimes, it&#39;s not clear from the command line whether a certain file</span>
+<span class="sd">        is an input or output file to a given process).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
+            <span class="s1">&#39;stdout_path&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">stdout_path</span><span class="p">),</span>
+            <span class="s1">&#39;stderr_path&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">stderr_path</span><span class="p">),</span>
+            <span class="s1">&#39;hints&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">hints</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">launch_calls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">call</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessPool.log"><a class="viewcode-back" href="../api.html#process_pool.ProcessPool.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Append a message to the pipeline log.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">formatted_message</span> <span class="o">=</span> <span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">),</span> <span class="n">message</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">formatted_message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">formatted_message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessPool.get_log"><a class="viewcode-back" href="../api.html#process_pool.ProcessPool.get_log">[docs]</a>    <span class="k">def</span> <span class="nf">get_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the log as a dictionary.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;processes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">proc_details_copy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_order</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;listener_for&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">]:</span>
+                <span class="n">attach_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;listener_for&#39;</span><span class="p">]</span>
+                <span class="n">proc_details_copy</span><span class="p">[</span><span class="n">attach_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">attach_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> \
+                    <span class="s1">&#39;_copy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">])</span>
+                <span class="k">del</span> <span class="n">proc_details_copy</span><span class="p">[</span><span class="n">attach_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                      <span class="p">][</span><span class="n">attach_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_copy&#39;</span><span class="p">][</span><span class="s1">&#39;listener_for&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">proc_details_copy</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_order</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">proc_details_copy</span><span class="p">:</span>
+                <span class="n">log</span><span class="p">[</span><span class="s1">&#39;processes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proc_details_copy</span><span class="p">[</span><span class="n">pid</span><span class="p">])</span>
+
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_entries</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;process_watcher&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process_watcher_report</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">[</span><span class="s1">&#39;ok_to_fail&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ok_to_fail</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">log</span></div>
+
+    <span class="k">def</span> <span class="nf">_launch_all_processes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">launch_calls</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">:</span>
+                <span class="n">pipeline</span> <span class="o">=</span> <span class="n">info</span>
+                <span class="n">use_stdin</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">last_pid</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">append_calls</span><span class="p">):</span>
+                    <span class="n">use_stdin</span><span class="p">,</span> <span class="n">pid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_launch</span><span class="p">(</span>
+                        <span class="n">info</span><span class="p">,</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">append_calls</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">use_stdin</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">last_pid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;use_stdin_of&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">last_pid</span>
+                    <span class="n">last_pid</span> <span class="o">=</span> <span class="n">pid</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_do_launch</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_do_launch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">keep_stdout_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_stdin</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Launch a process and after that, launch a copy process for *stdout* and</span>
+<span class="sd">        *stderr* each.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">])</span>
+        <span class="n">stdout_path</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;stdout_path&#39;</span><span class="p">])</span>
+        <span class="n">stderr_path</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;stderr_path&#39;</span><span class="p">])</span>
+        <span class="n">hints</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;hints&#39;</span><span class="p">])</span>
+
+        <span class="n">program_name</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">program_name</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="n">new_args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">program_name</span> <span class="o">=</span> <span class="n">new_args</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">new_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">new_args</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_subprocess_command</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="c1"># launch the process and always pipe stdout and stderr because we</span>
+        <span class="c1"># want to watch both streams, regardless of whether stdout should</span>
+        <span class="c1"># be passed on to another process</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="n">args</span><span class="p">,</span>
+            <span class="n">stdin</span><span class="o">=</span><span class="n">use_stdin</span><span class="p">,</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">preexec_fn</span><span class="o">=</span><span class="n">restore_sigpipe_handler</span><span class="p">,</span>
+            <span class="n">close_fds</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">pid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">popen_procs</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">proc</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">running_procs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proc_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">program_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">args</span><span class="p">,</span>
+            <span class="s1">&#39;pid&#39;</span><span class="p">:</span> <span class="n">pid</span><span class="p">,</span>
+            <span class="s1">&#39;hints&#39;</span><span class="p">:</span> <span class="n">hints</span><span class="p">,</span>
+            <span class="s1">&#39;stdout_path&#39;</span><span class="p">:</span> <span class="n">stdout_path</span><span class="p">,</span>
+            <span class="s1">&#39;stderr_path&#39;</span><span class="p">:</span> <span class="n">stderr_path</span>
+        <span class="p">}</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Launched </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2"> as PID </span><span class="si">%d</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">).&quot;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="n">pipe</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">keep_stdout_open</span><span class="p">:</span>
+            <span class="n">pipe</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">pipe</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_processes_for_pid</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">which</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">,</span> <span class="s1">&#39;stderr&#39;</span><span class="p">]:</span>
+            <span class="n">report_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">add_temporary_file</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">-report&quot;</span> <span class="o">%</span> <span class="n">which</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">)</span>
+            <span class="n">sink_path</span> <span class="o">=</span> <span class="n">stdout_path</span> <span class="k">if</span> <span class="n">which</span> <span class="o">==</span> <span class="s1">&#39;stdout&#39;</span> <span class="k">else</span> <span class="n">stderr_path</span>
+            <span class="n">listener_pid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_launch_copy_process</span><span class="p">(</span>
+                <span class="n">proc</span><span class="o">.</span><span class="n">stdout</span> <span class="k">if</span> <span class="n">which</span> <span class="o">==</span> <span class="s1">&#39;stdout&#39;</span> <span class="k">else</span> <span class="n">proc</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+                <span class="n">sink_path</span><span class="p">,</span>
+                <span class="n">report_path</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span>
+                <span class="n">pipe</span> <span class="k">if</span> <span class="n">which</span> <span class="o">==</span> <span class="s1">&#39;stdout&#39;</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">copy_processes_for_pid</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">listener_pid</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">copy_process_reports</span><span class="p">[</span><span class="n">listener_pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">report_path</span>
+
+            <span class="k">if</span> <span class="n">sink_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">listener_pid</span><span class="p">][</span><span class="s1">&#39;sink&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span>
+                    <span class="n">sink_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">listener_pid</span><span class="p">][</span><span class="s1">&#39;sink_full_path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+                    <span class="n">sink_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">keep_stdout_open</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">pipe</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">pipe</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pid</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pid</span>
+
+    <span class="k">def</span> <span class="nf">_do_launch_copy_process</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">fin</span><span class="p">,</span>
+            <span class="n">fout_path</span><span class="p">,</span>
+            <span class="n">report_path</span><span class="p">,</span>
+            <span class="n">parent_pid</span><span class="p">,</span>
+            <span class="n">which</span><span class="p">,</span>
+            <span class="n">pipe</span><span class="p">):</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">write_report_and_exit</span><span class="p">(</span><span class="n">signum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># write report</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">report_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">freport</span><span class="p">:</span>
+                        <span class="n">report</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                        <span class="n">report</span><span class="p">[</span><span class="s1">&#39;sha256&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">checksum</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+                        <span class="n">report</span><span class="p">[</span><span class="s1">&#39;tail&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tail</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+                        <span class="n">report</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">length</span>
+                        <span class="n">report</span><span class="p">[</span><span class="s1">&#39;lines&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newline_count</span>
+                        <span class="n">freport</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">report</span><span class="p">))</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">LookupError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Eror while writing </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">): </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                 <span class="p">(</span><span class="n">report_path</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">,</span> <span class="n">write_report_and_exit</span><span class="p">)</span>
+            <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">write_report_and_exit</span><span class="p">)</span>
+            <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGPIPE</span><span class="p">,</span> <span class="n">write_report_and_exit</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">setsid</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">pipe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">pipe</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">fdout</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">fout_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">fdout</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fout_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span> <span class="o">|</span>
+                                <span class="n">os</span><span class="o">.</span><span class="n">O_CREAT</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_TRUNC</span><span class="p">)</span>
+
+            <span class="n">checksum</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+            <span class="n">tail</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">newline_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">block</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ProcessPool</span><span class="o">.</span><span class="n">COPY_BLOCK_SIZE</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># fin reports EOF, let&#39;s call it a day</span>
+                    <span class="k">break</span>
+
+                <span class="c1"># update checksum</span>
+                <span class="n">checksum</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+
+                <span class="c1"># update tail</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">TAIL_LENGTH</span><span class="p">:</span>
+                    <span class="n">tail</span> <span class="o">=</span> <span class="n">block</span><span class="p">[</span><span class="o">-</span><span class="n">ProcessPool</span><span class="o">.</span><span class="n">TAIL_LENGTH</span><span class="p">:]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">keep_length</span> <span class="o">=</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">TAIL_LENGTH</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+                    <span class="n">tail</span> <span class="o">=</span> <span class="n">tail</span><span class="p">[</span><span class="o">-</span><span class="n">keep_length</span><span class="p">:]</span> <span class="o">+</span> <span class="n">block</span>
+
+                <span class="c1"># update length</span>
+                <span class="n">length</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+
+                <span class="c1"># update newline_count</span>
+                <span class="n">newline_count</span> <span class="o">+=</span> <span class="n">block</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                <span class="c1"># write block to output file</span>
+                <span class="k">if</span> <span class="n">fdout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">tries</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">bytes_written</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">while</span> <span class="ow">not</span> <span class="n">bytes_written</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">bytes_written</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fdout</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                            <span class="n">tries</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="k">if</span> <span class="n">tries</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                                <span class="k">raise</span>
+                            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">bytes_written</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="p">):</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+                <span class="c1"># write block to pipe</span>
+                <span class="k">if</span> <span class="n">pipe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">tries</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">bytes_written</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">while</span> <span class="ow">not</span> <span class="n">bytes_written</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">bytes_written</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pipe</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">block</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                            <span class="n">tries</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="k">if</span> <span class="n">tries</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                                <span class="k">raise</span>
+                            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">bytes_written</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="p">):</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="c1"># we&#39;re finished, close everything</span>
+            <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">fdout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fdout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pipe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">pipe</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">write_report_and_exit</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">running_procs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;[stream listener for </span><span class="si">%s</span><span class="s1"> of PID </span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">which</span><span class="p">,</span> <span class="n">parent_pid</span><span class="p">),</span>
+                <span class="s1">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+                <span class="s1">&#39;pid&#39;</span><span class="p">:</span> <span class="n">pid</span><span class="p">,</span>
+                <span class="s1">&#39;listener_for&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">parent_pid</span><span class="p">,</span> <span class="n">which</span><span class="p">],</span>
+                <span class="s1">&#39;report_path&#39;</span><span class="p">:</span> <span class="n">report_path</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                <span class="s2">&quot;Launched a copy process with PID </span><span class="si">%d</span><span class="s2"> to capture </span><span class="si">%s</span><span class="s2"> of PID </span><span class="si">%d</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">parent_pid</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">fout_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;...which gets also redirected to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fout_path</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pid</span>
+
+    <span class="k">def</span> <span class="nf">_wait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Wait for all processes to exit.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;Now launching process watcher and waiting for all child &quot;</span>
+                 <span class="s2">&quot;processes to exit.&quot;</span><span class="p">)</span>
+        <span class="n">watcher_report_path</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">add_temporary_file</span><span class="p">(</span><span class="s1">&#39;watcher-report&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.yaml&#39;</span><span class="p">)</span>
+        <span class="n">watcher_pid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_launch_process_watcher</span><span class="p">(</span><span class="n">watcher_report_path</span><span class="p">)</span>
+        <span class="n">ProcessPool</span><span class="o">.</span><span class="n">process_watcher_pid</span> <span class="o">=</span> <span class="n">watcher_pid</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">first_failed_pid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">was_reporter</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">failed_pids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">running_procs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># wait for the next child process to exit</span>
+                <span class="n">pid</span><span class="p">,</span> <span class="n">exit_code_with_signal</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="n">signal_number</span> <span class="o">=</span> <span class="n">exit_code_with_signal</span> <span class="o">&amp;</span> <span class="mi">255</span>
+                <span class="n">exit_code</span> <span class="o">=</span> <span class="n">exit_code_with_signal</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;unkown name&#39;</span>
+                <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PID </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">), Signal: </span><span class="si">%s</span><span class="s2">, Exit code: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">signal_number</span><span class="p">,</span> <span class="n">exit_code</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">pid</span> <span class="o">==</span> <span class="n">watcher_pid</span><span class="p">:</span>
+                    <span class="n">ProcessPool</span><span class="o">.</span><span class="n">process_watcher_pid</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">watcher_report_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">process_watcher_report</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                                <span class="n">f</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                            <span class="s2">&quot;Couldn&#39;t load watcher report from </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                            <span class="n">watcher_report_path</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Reading the watcher failed with: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+                        <span class="k">raise</span>
+                    <span class="c1"># the process watcher has terminated, which is cool, I guess</span>
+                    <span class="c1"># (if it&#39;s the last child process, anyway)</span>
+                    <span class="k">continue</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># remove pid from self.running_procs</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">running_procs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pid</span> <span class="o">!=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">():</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Caught a process which we &quot;</span>
+                                     <span class="s2">&quot;didn&#39;t know: </span><span class="si">%d</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">pid</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;end_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+                <span class="n">what_happened</span> <span class="o">=</span> <span class="s2">&quot;has exited with exit code </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">exit_code</span>
+                <span class="k">if</span> <span class="n">signal_number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">what_happened</span> <span class="o">=</span> <span class="s2">&quot;has received signal </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">signal_number</span>
+                    <span class="k">if</span> <span class="n">signal_number</span> <span class="ow">in</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">SIGNAL_NAMES</span><span class="p">:</span>
+                        <span class="n">what_happened</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="s2">&quot;has received </span><span class="si">%s</span><span class="s2"> (signal number </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">ProcessPool</span><span class="o">.</span><span class="n">SIGNAL_NAMES</span><span class="p">[</span><span class="n">signal_number</span><span class="p">],</span> <span class="n">signal_number</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> (PID </span><span class="si">%d</span><span class="s2">) </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">pid</span><span class="p">,</span> <span class="n">what_happened</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;PID </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">what_happened</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">signal_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;exit_code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exit_code</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;signal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal_number</span>
+                        <span class="k">if</span> <span class="n">signal_number</span> <span class="ow">in</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">SIGNAL_NAMES</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;signal_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">SIGNAL_NAMES</span><span class="p">[</span><span class="n">signal_number</span><span class="p">]</span>
+
+                    <span class="c1"># now kill it&#39;s predecessor</span>
+                    <span class="k">if</span> <span class="s1">&#39;use_stdin_of&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">]:</span>
+                        <span class="n">kpid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;use_stdin_of&#39;</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                            <span class="s2">&quot;Now killing </span><span class="si">%d</span><span class="s2">, the predecessor of </span><span class="si">%d</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">).&quot;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">kpid</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+                        <span class="k">if</span> <span class="n">kpid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="s1">&#39;PID </span><span class="si">%s</span><span class="s1"> is &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span>
+                                <span class="p">(</span><span class="n">kpid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">kpid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">ok_to_fail</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">kpid</span><span class="p">)</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">kpid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGPIPE</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ESRCH</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t kill </span><span class="si">%d</span><span class="s2">: no such &quot;</span>
+                                         <span class="s2">&quot;process.&quot;</span> <span class="o">%</span> <span class="n">kpid</span><span class="p">)</span>
+                                <span class="k">pass</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">raise</span>
+
+                    <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_process_reports</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">first_failed_pid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">was_reporter</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">report_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_process_reports</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span>
+                        <span class="n">report</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">report_path</span><span class="p">):</span>
+                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">report_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                                <span class="n">report</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+
+                            <span class="k">if</span> <span class="n">report</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">first_failed_pid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">was_reporter</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">except</span> <span class="n">TimeoutException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exception</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;Timeout, killing all child processes now.&quot;</span><span class="p">)</span>
+                <span class="n">ProcessPool</span><span class="o">.</span><span class="n">kill_all_child_processes</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ECHILD</span><span class="p">:</span>
+                    <span class="c1"># no more children running, we are done</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;ProcessPool: There are no child &quot;</span>
+                                 <span class="s2">&quot;processes left, exiting.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;Cancelling timeout (if there was one), all &quot;</span>
+                             <span class="s2">&quot;child processes have exited.&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EINTR</span><span class="p">:</span>
+                    <span class="c1"># a system call was interrupted, pfft.</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">exit_code_with_signal</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ok_to_fail</span><span class="p">:</span>
+                        <span class="c1"># Oops, something went wrong. See what happens and</span>
+                        <span class="c1"># terminate all child processes in a few seconds.</span>
+                        <span class="k">if</span> <span class="n">first_failed_pid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">first_failed_pid</span> <span class="o">=</span> <span class="n">pid</span>
+                        <span class="n">failed_pids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+                        <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="n">timeout_handler</span><span class="p">)</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;unkown&#39;</span>
+                        <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                            <span class="s1">&#39;Terminating all children of &quot;</span><span class="si">%s</span><span class="s1">&quot; in </span><span class="si">%d</span><span class="s1"> seconds...&#39;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">SIGTERM_TIMEOUT</span><span class="p">))</span>
+                        <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="n">ProcessPool</span><span class="o">.</span><span class="n">SIGTERM_TIMEOUT</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;unkown name&#39;</span>
+                        <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;PID </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">) was expected to fail &#39;</span>
+                                     <span class="s1">&#39;because the kill signal was send. &#39;</span>
+                                     <span class="s1">&#39;Now killing its copy processes.&#39;</span> <span class="o">%</span>
+                                     <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">kpid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_processes_for_pid</span><span class="p">[</span><span class="n">pid</span><span class="p">]:</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">kpid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ESRCH</span><span class="p">:</span>
+                                    <span class="c1"># the copy process already exited</span>
+                                    <span class="k">pass</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">raise</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Killed copy process of </span><span class="si">%d</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">): </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span>
+                                             <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">kpid</span><span class="p">))</span>
+
+        <span class="c1"># now wait for the watcher process, if it still exists</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="n">watcher_pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">watcher_report_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">process_watcher_report</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                        <span class="n">f</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t load watcher report from </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                               <span class="n">watcher_report_path</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Reading the watcher failed with: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ESRCH</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ECHILD</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Watcher report:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                     <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process_watcher_report</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">first_failed_pid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">was_reporter</span><span class="p">:</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="s1">&#39;Reporter crashed </span><span class="si">%s</span><span class="s1"> exit with code </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
+                    <span class="p">(</span><span class="n">first_failed_pid</span><span class="p">,</span> <span class="n">exit_code_with_signal</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">report</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">log</span> <span class="o">+=</span> <span class="s1">&#39; while writing into &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">first_failed_pid</span><span class="p">][</span><span class="s1">&#39;report_path&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">failed_pids</span><span class="p">:</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;unkown name&#39;</span>
+                    <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                    <span class="n">stderr_listener</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_processes_for_pid</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">report</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">stderr_listener</span><span class="p">][</span><span class="s1">&#39;tail&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">report</span> <span class="ow">and</span> <span class="n">report</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;stderr tail of </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">):</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                     <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">report</span><span class="p">))</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="s2">&quot;Pipeline crashed while working in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">get_temp_output_directory</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_launch_process_watcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">watcher_report_path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Launch the process watcher via fork. The process watcher repeatedly</span>
+<span class="sd">        determines all child processes of the main process and determines their</span>
+<span class="sd">        current and maximum CPU and RAM usage.</span>
+<span class="sd">        Initially, this is done in short intervals (0.1 seconds), so that very</span>
+<span class="sd">        short-lived processes can be watched but the frequency drops quickly so</span>
+<span class="sd">        that after a while, child processes are only examined every 10 seconds.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">super_pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">human_readable_size</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;KB&#39;</span><span class="p">,</span> <span class="s1">&#39;MB&#39;</span><span class="p">,</span> <span class="s1">&#39;GB&#39;</span><span class="p">,</span> <span class="s1">&#39;TB&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;</span> <span class="mf">1024.0</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">size</span> <span class="o">/=</span> <span class="mf">1024.0</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%%</span><span class="s2">.</span><span class="si">%d</span><span class="s2">f </span><span class="si">%%</span><span class="s2">s&quot;</span> <span class="o">%</span> <span class="n">decimal_places</span> <span class="o">%</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+
+        <span class="n">watcher_pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">watcher_pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">nice</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIG_DFL</span><span class="p">)</span>
+                <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIG_IGN</span><span class="p">)</span>
+                <span class="n">called_cpu_stat_for_childpid</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                <span class="n">procs</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">]:</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                        <span class="n">names</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="n">procs</span><span class="p">[</span><span class="n">super_pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">super_pid</span><span class="p">)</span>
+                <span class="n">names</span><span class="p">[</span><span class="n">super_pid</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> (uap)&#39;</span> <span class="o">%</span> <span class="n">super_pid</span>
+                <span class="n">procs</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()]</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span>
+                <span class="n">names</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> (watcher)&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_procs</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">procs</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">psutil</span><span class="o">.</span><span class="n">NoSuchProcess</span><span class="p">:</span>
+                        <span class="k">pass</span>
+
+                <span class="n">pid_list</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">procs</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">pid_list</span><span class="p">:</span>
+                    <span class="n">proc</span> <span class="o">=</span> <span class="n">procs</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">cpu_percent</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">cpu_percent</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                        <span class="c1"># add values for all children</span>
+                        <span class="k">if</span> <span class="n">pid</span> <span class="o">!=</span> <span class="n">super_pid</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">proc</span><span class="o">.</span><span class="n">children</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                                <span class="k">try</span><span class="p">:</span>
+                                    <span class="n">cpu_percent</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">cpu_percent</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                                    <span class="n">called_cpu_stat_for_childpid</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+                                <span class="k">except</span> <span class="n">psutil</span><span class="o">.</span><span class="n">NoSuchProcess</span><span class="p">:</span>
+                                    <span class="k">pass</span>
+                    <span class="k">except</span> <span class="n">psutil</span><span class="o">.</span><span class="n">NoSuchProcess</span><span class="p">:</span>
+                        <span class="k">del</span> <span class="n">procs</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span>
+
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+                <span class="n">iterations</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">delay</span> <span class="o">=</span> <span class="mf">0.5</span>
+                <span class="n">max_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="n">first_call</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">pid_list</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">procs</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                    <span class="n">sum_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">first_call</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">first_call</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">first_io</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">disk_io_counters</span><span class="p">()</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>
+                        <span class="n">first_net</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">net_io_counters</span><span class="p">()</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>
+                    <span class="k">elif</span> <span class="n">first_call</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="n">first_call</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">pid_list</span><span class="p">:</span>
+                        <span class="n">proc</span> <span class="o">=</span> <span class="n">procs</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">names</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="n">names</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="n">pid</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                            <span class="k">with</span> <span class="n">proc</span><span class="o">.</span><span class="n">oneshot</span><span class="p">():</span>
+                                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;cpu_percent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">cpu_percent</span><span class="p">(</span>
+                                    <span class="n">interval</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;threads&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">threads</span><span class="p">())</span>
+                                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;memory_percent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">memory_percent</span><span class="p">()</span>
+                                <span class="n">memory_info</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">memory_info</span><span class="p">()</span>
+                                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;rss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">memory_info</span><span class="o">.</span><span class="n">rss</span>
+                                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;vms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">memory_info</span><span class="o">.</span><span class="n">vms</span>
+
+                            <span class="c1"># add values for all children</span>
+                            <span class="k">if</span> <span class="n">pid</span> <span class="o">!=</span> <span class="n">super_pid</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">proc</span><span class="o">.</span><span class="n">children</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                                    <span class="k">try</span><span class="p">:</span>
+                                        <span class="k">with</span> <span class="n">p</span><span class="o">.</span><span class="n">oneshot</span><span class="p">():</span>
+                                            <span class="n">v</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">cpu_percent</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                                            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">pid</span> <span class="ow">in</span> <span class="n">called_cpu_stat_for_childpid</span><span class="p">:</span>
+                                                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;cpu_percent&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">v</span>
+                                            <span class="n">called_cpu_stat_for_childpid</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                                                <span class="n">p</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+                                            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;memory_percent&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">p</span><span class="o">.</span><span class="n">memory_percent</span><span class="p">()</span>
+                                            <span class="n">memory_info</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">memory_info</span><span class="p">()</span>
+                                            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;rss&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">memory_info</span><span class="o">.</span><span class="n">rss</span>
+                                            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;vms&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">memory_info</span><span class="o">.</span><span class="n">vms</span>
+                                    <span class="k">except</span> <span class="n">psutil</span><span class="o">.</span><span class="n">NoSuchProcess</span><span class="p">:</span>
+                                        <span class="k">pass</span>
+
+                            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">max_data</span><span class="p">:</span>
+                                <span class="n">max_data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                                <span class="n">max_data</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_data</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sum_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                                    <span class="n">sum_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                                <span class="n">sum_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">v</span>
+
+                        <span class="k">except</span> <span class="n">psutil</span><span class="o">.</span><span class="n">NoSuchProcess</span><span class="p">:</span>
+                            <span class="k">del</span> <span class="n">procs</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="s1">&#39;sum&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">max_data</span><span class="p">:</span>
+                        <span class="n">max_data</span><span class="p">[</span><span class="s1">&#39;sum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">sum_data</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sum_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">max_data</span><span class="p">[</span><span class="s1">&#39;sum&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_data</span><span class="p">[</span><span class="s1">&#39;sum&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+
+                    <span class="n">cpu_data</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_times</span><span class="p">()</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>
+                    <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cpu_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">/</span> <span class="mi">100</span>
+                    <span class="k">if</span> <span class="s1">&#39;host cpu percentages&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">max_data</span><span class="p">:</span>
+                        <span class="n">max_data</span><span class="p">[</span><span class="s1">&#39;host cpu percentages&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="o">/</span> <span class="n">total</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cpu_data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cpu_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="n">max_data</span><span class="p">[</span><span class="s1">&#39;host cpu percentages&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                                <span class="n">max_data</span><span class="p">[</span><span class="s1">&#39;host cpu percentages&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="n">v</span> <span class="o">/</span> <span class="n">total</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">procs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first_call</span><span class="p">:</span>
+                        <span class="c1"># there&#39;s nothing more to watch, write report and exit</span>
+                        <span class="c1"># (now there&#39;s only the controlling python process and</span>
+                        <span class="c1"># the process watcher itself</span>
+                        <span class="n">report</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                        <span class="n">io_data</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">disk_io_counters</span><span class="p">()</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>
+                        <span class="n">report</span><span class="p">[</span><span class="s1">&#39;host io stats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="n">k</span><span class="p">:</span> <span class="n">io_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">first_io</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">io_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+                        <span class="n">net_data</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">net_io_counters</span><span class="p">()</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>
+                        <span class="n">report</span><span class="p">[</span><span class="s1">&#39;host net stats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="n">k</span><span class="p">:</span> <span class="n">net_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">first_net</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">net_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+                        <span class="n">new_field</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">field</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                <span class="k">if</span> <span class="s1">&#39;bytes&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                                    <span class="n">new_field</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)]</span> <span class="o">=</span> \
+                                        <span class="n">human_readable_size</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">max_data</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">field</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rss&#39;</span><span class="p">,</span> <span class="s1">&#39;vms&#39;</span><span class="p">]:</span>
+                                    <span class="n">new_field</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span>
+                                              <span class="s1">&#39; unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">human_readable_size</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                        <span class="n">field</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_field</span><span class="p">)</span>
+                        <span class="n">report</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_data</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">watcher_report_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                                <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+                                    <span class="n">report</span><span class="p">,</span>
+                                    <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+                    <span class="n">iterations</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">iterations</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+                        <span class="n">delay</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">iterations</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
+                        <span class="n">delay</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="k">if</span> <span class="n">iterations</span> <span class="o">==</span> <span class="mi">30</span><span class="p">:</span>
+                        <span class="n">delay</span> <span class="o">=</span> <span class="mi">10</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exception</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;unkown name&#39;</span>
+                <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;PID </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">) Process Watcher Exception: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                             <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">error</span><span class="p">))</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">watcher_pid</span>
+
+<div class="viewcode-block" id="ProcessPool.kill"><a class="viewcode-back" href="../api.html#process_pool.ProcessPool.kill">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Kills all user-launched processes. After that, the remaining process</span>
+<span class="sd">        will end and a report will be written.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">ProcessPool</span><span class="o">.</span><span class="n">process_pool_is_dead</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="n">timeout_handler</span><span class="p">)</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="n">ProcessPool</span><span class="o">.</span><span class="n">SIGTERM_TIMEOUT</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">current_instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="n">ProcessPool</span><span class="o">.</span><span class="n">current_instance</span>
+            <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_processes_for_pid</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Killing </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">)</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">ESRCH</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Trying to kill already dead process </span><span class="si">%s</span><span class="s1">.&#39;</span>
+                                     <span class="o">%</span> <span class="n">pid</span><span class="p">)</span>
+                        <span class="k">return</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;unkown name&#39;</span>
+                    <span class="k">if</span> <span class="n">pid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_details</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="s2">&quot;While trying to kill PID </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">) there was </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ProcessPool.kill_all_child_processes"><a class="viewcode-back" href="../api.html#process_pool.ProcessPool.kill_all_child_processes">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">kill_all_child_processes</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Kill all child processes of this process by sending a SIGTERM to each of them.</span>
+<span class="sd">        This includes all children which were not launched by this module, and</span>
+<span class="sd">        their children etc.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">proc</span><span class="o">.</span><span class="n">children</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">psutil</span><span class="o">.</span><span class="n">NoSuchProcess</span><span class="p">:</span>
+                <span class="k">pass</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christoph Kämpf, Michael Specht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

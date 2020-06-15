@@ -1,0 +1,272 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Results: Annotation Files &mdash; uap 2.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Available steps" href="steps.html" />
+    <link rel="prev" title="Tested Platforms" href="platforms.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> uap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introducing <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#software-design">Software Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html#recommended-uap-workflow">Recommended <strong>uap</strong> Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to.html">Quick Start <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Analysis Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html#cluster-configuration-file">Cluster Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interaction.html">Command-Line Usage of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="extension.html">Add New Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Tested Platforms</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Annotation Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#known-paths">known_paths</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="steps.html">Available steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Information for uap Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">uap</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Results: Annotation Files</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/annotation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="annotation-files">
+<span id="id1"></span><h1>Annotation Files<a class="headerlink" href="#annotation-files" title="Permalink to this headline">¶</a></h1>
+<p>The annotation files contain detailed information about every output file.
+Also, the Git SHA1 hash of the <strong>uap</strong> repository at the time of
+data processing is included.
+The executed commands are listed.
+Annotation contains information about inter-process streams and output files,
+including SHA1 and SHA256 checksums, file sizes, and line counts as well.</p>
+<p>Upon successful completion of a task, an extensive YAML-formatted annotation
+is placed next to the output files in a file called
+<code class="docutils literal notranslate"><span class="pre">.[task_id]-annotation.yaml</span></code>.
+Also, for every output file, a symbolic link to this file is created:
+<code class="docutils literal notranslate"><span class="pre">.[output_filename].annotation.yaml</span></code>.</p>
+<p>Finally, the annotation is rendered via GraphViz, if available.
+Rendering can also be done at a later time using annotations as input (see
+<strong>uap</strong>’s <a class="reference internal" href="interaction.html#uap-render"><span class="std std-ref">render</span></a> subcommand).
+The annotation can be used to determine at a later time what exactly happened.
+Also, annotations may help to identify bottlenecks.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 55%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><a class="reference internal image-reference" href="_images/cutadapt.png"><img alt="_images/cutadapt.png" src="_images/cutadapt.png" style="height: 500px;" /></a>
+<p>Annotation graph of a <code class="docutils literal notranslate"><span class="pre">cutadapt</span></code>
+run. CPU and RAM usage for individual
+processes are shown, file sizes
+and line counts are shown for
+output files and inter-process
+streams.</p>
+</td>
+<td><a class="reference internal image-reference" href="_images/cpu-starving.png"><img alt="_images/cpu-starving.png" src="_images/cpu-starving.png" style="height: 500px;" /></a>
+<p>In this graph, it becomes evident that
+the <code class="docutils literal notranslate"><span class="pre">fix_cutadapt.py</span></code> process in the middle
+gets throttled by the following two <code class="docutils literal notranslate"><span class="pre">pigz</span></code>
+processes, which only run with one core
+each and therefore cannot compress the
+results fast enough.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="known-paths">
+<h2>known_paths<a class="headerlink" href="#known-paths" title="Permalink to this headline">¶</a></h2>
+<p>Contains information about all directories/files used during processing a run.
+uap calculates the SHA256 hexdigest for each known file with the designation ‘output’ aka.
+output/result files.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="steps.html" class="btn btn-neutral float-right" title="Available steps" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="platforms.html" class="btn btn-neutral float-left" title="Tested Platforms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christoph Kämpf, Michael Specht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

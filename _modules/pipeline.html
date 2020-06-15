@@ -1,0 +1,1321 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pipeline &mdash; uap 2.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> uap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introducing <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html#software-design">Software Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html#recommended-uap-workflow">Recommended <strong>uap</strong> Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to.html">Quick Start <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Analysis Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html#cluster-configuration-file">Cluster Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interaction.html">Command-Line Usage of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extension.html">Add New Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platforms.html">Tested Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotation.html">Annotation Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../steps.html">Available steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers.html">Information for uap Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">uap</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>pipeline</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pipeline</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">distutils.spawn</span> <span class="kn">import</span> <span class="n">find_executable</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">import</span> <span class="nn">abstract_step</span>
+<span class="kn">import</span> <span class="nn">misc</span>
+<span class="kn">import</span> <span class="nn">task</span> <span class="k">as</span> <span class="nn">task_module</span>
+<span class="kn">from</span> <span class="nn">uaperrors</span> <span class="kn">import</span> <span class="n">UAPError</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;uap_logger&quot;</span><span class="p">)</span>
+
+<span class="n">coreutils</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;basename&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cat&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cp&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cut&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;date&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dd&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dirname&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;du&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;head&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ln&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ls&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mkdir&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mkfifo&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;paste&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;printf&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pwd&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;seq&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sleep&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sort&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;rm&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;tail&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;tee&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;tr&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;uniq&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wc&#39;</span><span class="p">}</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Some GNU Core Utilities that are configured by default to be callable</span>
+<span class="sd">by name and to ignore theire version in the output hash.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+
+<div class="viewcode-block" id="ConfigurationException"><a class="viewcode-back" href="../api.html#pipeline.ConfigurationException">[docs]</a><span class="k">class</span> <span class="nc">ConfigurationException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;an exception class for reporting configuration errors&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">exec_pre_post_calls</span><span class="p">(</span><span class="n">tool_id</span><span class="p">,</span> <span class="n">info_key</span><span class="p">,</span> <span class="n">info_command</span><span class="p">,</span>
+                        <span class="n">tool_check_info</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">info_command</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">info_command</span> <span class="o">=</span> <span class="p">[</span><span class="n">info_command</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">info_command</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="n">command</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argument</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                    <span class="s2">&quot;The command to be launched &#39;</span><span class="si">%s</span><span class="s2">&#39; contains non-string &quot;</span>
+                    <span class="s2">&quot;argument &#39;</span><span class="si">%s</span><span class="s2">&#39;. Therefore the command will fail. Please &quot;</span>
+                    <span class="s2">&quot;fix this type issue.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">argument</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Executing command: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                <span class="n">command</span><span class="p">,</span>
+                <span class="n">stdin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">close_fds</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s2">&quot;Error while executing &#39;</span><span class="si">%s</span><span class="s2">&#39; for </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;Error no.: </span><span class="si">%s</span><span class="s2"> Error message: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="n">info_key</span><span class="p">,</span> <span class="n">tool_id</span><span class="p">,</span>
+                 <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">),</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">strerror</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">command_call</span> <span class="o">=</span> <span class="n">info_key</span>
+        <span class="n">command_exit_code</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-exit-code&#39;</span> <span class="o">%</span> <span class="n">info_key</span>
+        <span class="n">command_response</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-respone&#39;</span> <span class="o">%</span> <span class="n">info_key</span>
+        <span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">info_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;module_load&#39;</span><span class="p">,</span> <span class="s1">&#39;module_unload&#39;</span><span class="p">]:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Try &#39;</span><span class="si">%s</span><span class="s2">&#39; for &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">info_key</span><span class="p">,</span> <span class="n">tool_id</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">exec</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Error while loading module &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">tool_id</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)))</span>
+
+            <span class="n">tool_check_info</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="n">command_call</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                <span class="n">command_exit_code</span><span class="p">:</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span>
+            <span class="p">})</span>
+            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading tool </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">tool_id</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tool_check_info</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="n">command_call</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                <span class="n">command_exit_code</span><span class="p">:</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
+                <span class="n">command_response</span><span class="p">:</span> <span class="p">(</span><span class="n">output</span> <span class="o">+</span> <span class="n">error</span><span class="p">)</span>
+            <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">tool_check_info</span>
+
+
+<div class="viewcode-block" id="check_tool"><a class="viewcode-back" href="../api.html#pipeline.check_tool">[docs]</a><span class="k">def</span> <span class="nf">check_tool</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A top-level function to be used a multiprocessing pool to retrieve tool</span>
+<span class="sd">    information in parallel.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIG_IGN</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tool_id</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">tool_check_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="c1"># Load module(s) and execute command if configured</span>
+        <span class="k">for</span> <span class="n">pre_cmd</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;module_load&#39;</span><span class="p">,</span> <span class="s1">&#39;pre_command&#39;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">info</span><span class="p">):</span>
+            <span class="n">tool_check_info</span> <span class="o">=</span> <span class="n">exec_pre_post_calls</span><span class="p">(</span>
+                <span class="n">tool_id</span><span class="p">,</span> <span class="n">pre_cmd</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="n">pre_cmd</span><span class="p">],</span> <span class="n">tool_check_info</span><span class="p">)</span>
+
+        <span class="c1"># Execute command to check if tool is available</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">used_path</span> <span class="o">=</span> <span class="n">find_executable</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="n">command</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">used_path</span> <span class="o">=</span> <span class="n">find_executable</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unsupported format for path of tool &quot;</span><span class="si">%s</span><span class="s1">&quot;: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">tool_id</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]))</span>
+        <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;get_version&#39;</span><span class="p">])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Executing command: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                <span class="n">command</span><span class="p">,</span>
+                <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">close_fds</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Error while checking Tool </span><span class="si">%s</span><span class="s2"> &quot;</span>
+                           <span class="s2">&quot;Error no.: </span><span class="si">%s</span><span class="s2"> Error message: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">command: </span><span class="si">%s</span><span class="s2"> &quot;</span>
+                           <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">STDOUT-ERR: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">strerror</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span>
+                            <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">))</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="n">exit_code</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">exit_code</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="o">+</span> <span class="n">proc</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">tool_check_info</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+            <span class="s1">&#39;exit_code&#39;</span><span class="p">:</span> <span class="n">exit_code</span><span class="p">,</span>
+            <span class="s1">&#39;response&#39;</span><span class="p">:</span> <span class="n">out</span><span class="p">,</span>
+            <span class="s1">&#39;used_path&#39;</span><span class="p">:</span> <span class="n">used_path</span>
+        <span class="p">})</span>
+        <span class="n">expected_exit_code</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;exit_code&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">exit_code</span> <span class="o">!=</span> <span class="n">expected_exit_code</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s2">&quot;Tool check failed for </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> - exit code is: </span><span class="si">%d</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;(expected </span><span class="si">%d</span><span class="s2">) (response </span><span class="si">%s</span><span class="s2">)&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">tool_id</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">),</span>
+                   <span class="n">exit_code</span><span class="p">,</span> <span class="n">expected_exit_code</span><span class="p">,</span> <span class="n">tool_check_info</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="c1"># Execute clean-up command (if configured)</span>
+        <span class="k">for</span> <span class="n">info_key</span> <span class="ow">in</span> <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;module_unload&#39;</span><span class="p">,</span> <span class="s1">&#39;post_command&#39;</span><span class="p">)</span>
+                         <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">info</span><span class="p">):</span>
+            <span class="n">tool_check_info</span> <span class="o">=</span> <span class="n">exec_pre_post_calls</span><span class="p">(</span>
+                <span class="n">tool_id</span><span class="p">,</span> <span class="n">info_key</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="n">info_key</span><span class="p">],</span> <span class="n">tool_check_info</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="k">raise</span>
+    <span class="k">return</span> <span class="n">tool_id</span><span class="p">,</span> <span class="n">tool_check_info</span></div>
+
+
+<div class="viewcode-block" id="Pipeline"><a class="viewcode-back" href="../api.html#pipeline.Pipeline">[docs]</a><span class="k">class</span> <span class="nc">Pipeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The Pipeline class represents the entire processing pipeline which is defined</span>
+<span class="sd">    and configured via the configuration file config.yaml.</span>
+
+<span class="sd">    Individual steps may be defined in a tree, and their combination with samples</span>
+<span class="sd">    as generated by one or more source leads to an array of tasks.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">Enum</span><span class="p">([</span><span class="s1">&#39;WAITING&#39;</span><span class="p">,</span> <span class="s1">&#39;READY&#39;</span><span class="p">,</span> <span class="s1">&#39;QUEUED&#39;</span><span class="p">,</span> <span class="s1">&#39;EXECUTING&#39;</span><span class="p">,</span> <span class="s1">&#39;FINISHED&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;BAD&#39;</span><span class="p">,</span> <span class="s1">&#39;CHANGED&#39;</span><span class="p">,</span> <span class="s1">&#39;VOLATILIZED&#39;</span><span class="p">])</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Possible states a task can be in.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caught_signal</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">git_version</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">git_status</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">git_diff</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">git_untracked</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">git_tag</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="sd">&#39;&#39;&#39;use git diff to determine any changes in git</span>
+<span class="sd">        directory if git is available</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="s1">&#39;--version&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">git_version</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;Execution of </span><span class="si">%s</span><span class="s2"> failed. Git seems to be</span>
+<span class="s2">                         unavailable. Continue anyways&quot;&quot;&quot;</span> <span class="o">%</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">git_version</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;--porcelain&#39;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">git_status</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Execution of </span><span class="si">%s</span><span class="s2"> failed.&quot;</span> <span class="o">%</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+
+            <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="s1">&#39;diff&#39;</span><span class="p">,</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">git_diff</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Execution of </span><span class="si">%s</span><span class="s2"> failed.&quot;</span> <span class="o">%</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+
+            <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="s1">&#39;ls-files&#39;</span><span class="p">,</span> <span class="s1">&#39;--others&#39;</span><span class="p">,</span> <span class="s1">&#39;--exclude-standard&#39;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">git_untracked</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Execution of </span><span class="si">%s</span><span class="s2"> failed.&quot;</span> <span class="o">%</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+
+            <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="s1">&#39;describe&#39;</span><span class="p">,</span> <span class="s1">&#39;--all&#39;</span><span class="p">,</span> <span class="s1">&#39;--long&#39;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">git_tag</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Execution of </span><span class="si">%s</span><span class="s2"> failed.&quot;</span> <span class="o">%</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">git_diff</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;THE GIT REPOSITORY HAS UNCOMMITED CHANGES:</span><span class="se">\n</span><span class="s1">&#39;</span>
+                               <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">git_diff</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">git_untracked</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;THE GIT REPOSITORY HAS UNTRACKED FILES:</span><span class="se">\n</span><span class="s1">&#39;</span>
+                               <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">git_untracked</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        check if we got passed an &#39;arguments&#39; parameter</span>
+<span class="sd">        this parameter should contain a argparse.Namespace object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;arguments&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;arguments&#39;</span><span class="p">]</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Absolute path to the directory of the uap executable.</span>
+<span class="sd">        It is used to circumvent path issues.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uap_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">uap_path</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        The cluster type to be used (must be one of the keys specified in</span>
+<span class="sd">        cluster_config).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_uap_path</span><span class="p">,</span> <span class="s1">&#39;cluster/cluster-specific-commands.yaml&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cluster_config_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cluster_config_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">cluster_config_file</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># set cluster type</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">cluster</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_cluster_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">autodetect_cluster_type</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_cluster_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">cluster</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="c1"># cluster type is not an applicable parameter here, and that&#39;s fine</span>
+            <span class="c1"># (we&#39;re probably in run-locally.py)</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_working_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        User working directory.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;No &lt;project-config&gt;.yaml specified.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Name of the YAML configuration file</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config_path</span><span class="p">)</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Path of the YAML configuration file</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Dictionary representation of configuration YAML file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This dict stores step objects by their name. Each step knows his</span>
+<span class="sd">        dependencies.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">topological_step_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        List with topologically ordered steps.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_dependencies</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This dict stores file dependencies within this pipeline, but regardless</span>
+<span class="sd">        of step, output file tag or run ID. This dict has, for all output</span>
+<span class="sd">        files generated by the pipeline, a set of input files that output</span>
+<span class="sd">        file depends on.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_dependencies_reverse</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        This dict stores file dependencies within this pipeline, but regardless</span>
+<span class="sd">        of step, output file tag or run ID. This dict has, for all input</span>
+<span class="sd">        files required by the pipeline, a set of output files which are generated</span>
+<span class="sd">        using this input file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_id_for_output_file</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This dict stores a task ID for every output file created by the pipeline.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_for_output_file</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This dict stores a task ID for every output file created by the pipeline.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_ids_for_input_file</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This dict stores a set of task IDs for every input file used in the</span>
+<span class="sd">        pipeline.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_files_for_task_id</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This dict stores a set of input files for every task id in the pipeline.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_files_for_task_id</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This dict stores a set of output files for every task id in the pipeline.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_for_task_id</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This dict stores task objects by task IDs.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks_topologically_sorted</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        List of all tasks in topological order.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_in_step</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This dict stores tasks per step name.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_tools</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A set that stores all tools used by some step.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">known_config_keys</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;destination_path&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;constants&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;cluster&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;steps&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;lmod&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;tools&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;base_working_directory&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;id&#39;</span><span class="p">}</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A set of accepted keys in the config.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_lmod</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_steps</span><span class="p">()</span>
+
+        <span class="n">configured_tools</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tool</span> <span class="k">for</span> <span class="n">tool</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span>
+                               <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;atomatically_configured&#39;</span><span class="p">))</span>
+        <span class="n">unused_tools</span> <span class="o">=</span> <span class="n">configured_tools</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">used_tools</span>
+        <span class="k">if</span> <span class="n">unused_tools</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Unused tool(s): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">list</span><span class="p">(</span><span class="n">unused_tools</span><span class="p">))</span>
+
+        <span class="c1"># collect all tasks</span>
+        <span class="k">for</span> <span class="n">step_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topological_step_order</span><span class="p">:</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_step</span><span class="p">(</span><span class="n">step_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tasks_in_step</span><span class="p">[</span><span class="n">step_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Collect now all tasks for step: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">step</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">run_index</span><span class="p">,</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                    <span class="n">misc</span><span class="o">.</span><span class="n">natsorted</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">get_run_ids</span><span class="p">())):</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="n">task_module</span><span class="o">.</span><span class="n">Task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">run_index</span><span class="p">)</span>
+                <span class="c1"># if any run of a step contains an exec_groups,</span>
+                <span class="c1"># the task (step/run) is added to the task list</span>
+                <span class="n">run</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Step: </span><span class="si">%s</span><span class="s2">, Run: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">run_id</span><span class="p">))</span>
+                <span class="n">run_has_exec_groups</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">get_exec_groups</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">run_has_exec_groups</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">run_has_exec_groups</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Task: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">task</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks_topologically_sorted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tasks_in_step</span><span class="p">[</span><span class="n">step_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+                <span class="c1"># Fail if multiple tasks with the same name exist</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">task</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_for_task_id</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Duplicate task ID </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">task</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_for_task_id</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">task</span><span class="p">)]</span> <span class="o">=</span> <span class="n">task</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool_versions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">no_tool_checks</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_tools</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_uap_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_uap_path</span>
+
+    <span class="k">def</span> <span class="nf">get_cluster_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_config</span>
+
+    <span class="k">def</span> <span class="nf">get_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span>
+
+    <span class="k">def</span> <span class="nf">get_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="n">step_name</span><span class="p">]</span>
+
+    <span class="c1"># read configuration and make sure it&#39;s good</span>
+    <span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+
+        <span class="c1"># read yaml</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+        <span class="n">config_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># was yaml an annotation file?</span>
+        <span class="k">if</span> <span class="s1">&#39;config&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config_path</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;destination_path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[uap] Reading config from annotation file with destination &#39;</span>
+                  <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;destination_path&#39;</span><span class="p">])</span>
+
+        <span class="c1"># is the config valid</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_config_keys</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;The key &quot;</span><span class="si">%s</span><span class="s1">&quot; set in config is unknown.&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+
+        <span class="c1"># default id</span>
+        <span class="k">if</span> <span class="s1">&#39;id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_name</span>
+
+        <span class="c1"># new workin directory to work with relative paths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;base_working_directory&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config_path</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;base_working_directory&#39;</span><span class="p">])</span>
+
+        <span class="c1"># configure lmod</span>
+        <span class="k">if</span> <span class="s1">&#39;lmod&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;lmod&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;lmod&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;LMOD_CMD&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;lmod&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;LMOD_CMD&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;MODULEPATH&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;lmod&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+                <span class="s1">&#39;module_path&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MODULEPATH&#39;</span><span class="p">])</span>
+        <span class="n">lmod_configured</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;lmod&#39;</span><span class="p">]</span>
+                              <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;module_path&#39;</span><span class="p">])</span>
+
+        <span class="c1"># configure GNU Core Utilities</span>
+        <span class="k">if</span> <span class="s1">&#39;tools&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">coreutils</span><span class="p">:</span>
+            <span class="n">auto_add</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">tool</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">]</span> <span class="ow">or</span> \
+                    <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="n">auto_add</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;ignore_version&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+                <span class="s1">&#39;atomatically_configured&#39;</span><span class="p">,</span> <span class="n">auto_add</span><span class="p">)</span>
+
+        <span class="c1"># configure regular tools</span>
+        <span class="k">for</span> <span class="n">tool</span><span class="p">,</span> <span class="n">args</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">tool</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;get_version&#39;</span><span class="p">,</span> <span class="s1">&#39;--version&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;exit_code&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;ignore_version&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="s1">&#39;module_name&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;module_load&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;module_unload&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lmod_configured</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;The tool </span><span class="si">%s</span><span class="s2"> requires lmod, but lmod is not &quot;</span>
+                               <span class="s2">&quot;loaded nor configured in </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                               <span class="p">(</span><span class="n">tool</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s1">&#39;module_name&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]:</span>
+                <span class="n">mn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">][</span><span class="s1">&#39;module_name&#39;</span><span class="p">]</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> python load </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;lmod&#39;</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">],</span> <span class="n">mn</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;module_load&#39;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> python unload </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;lmod&#39;</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">],</span> <span class="n">mn</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;module_unload&#39;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+
+        <span class="c1"># configure tools that come with the uap</span>
+        <span class="n">uap_tools_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_uap_path</span><span class="p">,</span> <span class="s1">&#39;tools&#39;</span><span class="p">)</span>
+        <span class="n">uap_python</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_uap_path</span><span class="p">,</span> <span class="s2">&quot;python_env&quot;</span><span class="p">,</span> <span class="s2">&quot;bin&quot;</span><span class="p">,</span> <span class="s2">&quot;python&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tool_file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">uap_tools_path</span><span class="p">):</span>
+            <span class="n">tool_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">uap_tools_path</span><span class="p">,</span> <span class="n">tool_file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">tool_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">tool_path</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">tool</span> <span class="o">=</span> <span class="n">tool_file</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">auto_add</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">tool</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">]</span> <span class="ow">or</span> \
+                    <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">auto_add</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;atomatically_configured&#39;</span><span class="p">):</span>
+                <span class="n">auto_add</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">auto_add</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">uap_python</span><span class="p">,</span> <span class="n">tool_path</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+                    <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">uap_python</span><span class="p">,</span> <span class="n">tool_path</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;get_version&#39;</span><span class="p">,</span> <span class="s1">&#39;--help&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;exit_code&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;ignore_version&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">][</span><span class="n">tool</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+                <span class="s1">&#39;atomatically_configured&#39;</span><span class="p">,</span> <span class="n">auto_add</span><span class="p">)</span>
+
+        <span class="c1"># destination path</span>
+        <span class="k">if</span> <span class="s1">&#39;destination_path&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Missing key: destination_path&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;destination_path&#39;</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Destination path does not exist: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;destination_path&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;destination_path&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;destination_path&#39;</span><span class="p">])</span>
+
+        <span class="c1"># cluster</span>
+        <span class="k">if</span> <span class="s1">&#39;cluster&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;cluster&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;cluster&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_type</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;cluster&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+                <span class="s1">&#39;default_submit_options&#39;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_command</span><span class="p">(</span><span class="s1">&#39;default_options&#39;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;default_submit_options&#39;</span><span class="p">,</span> <span class="s1">&#39;default_pre_job_command&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;default_post_job_command&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;cluster&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;cluster&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;default_job_quota&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># no quota</span>
+
+    <span class="k">def</span> <span class="nf">build_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="s1">&#39;steps&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Missing key: steps&quot;</span><span class="p">)</span>
+        <span class="n">re_simple_key</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;^[a-zA-Z0-9_]+$&#39;</span><span class="p">)</span>
+        <span class="n">re_complex_key</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^([a-zA-Z0-9_]+)\s+\(([a-zA-Z0-9_]+)\)$&#39;</span><span class="p">)</span>
+
+        <span class="c1"># step one: instantiate all steps</span>
+        <span class="k">for</span> <span class="n">step_key</span><span class="p">,</span> <span class="n">step_description</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;steps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+            <span class="c1"># the step keys in the configuration may be either:</span>
+            <span class="c1"># - MODULE_NAME</span>
+            <span class="c1"># - DIFFERENT_STEP_NAME\s+\(MODULE_NAME\)</span>
+            <span class="n">step_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">module_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">re_simple_key</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">step_key</span><span class="p">):</span>
+                <span class="n">step_name</span> <span class="o">=</span> <span class="n">step_key</span>
+                <span class="n">module_name</span> <span class="o">=</span> <span class="n">step_key</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re_complex_key</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">step_key</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">step_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">module_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s1">&#39;temp&#39;</span><span class="p">:</span>
+                <span class="c1"># A step cannot be named &#39;temp&#39; because we need the out/temp</span>
+                <span class="c1"># directory to store temporary files.</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;A step name cannot be &#39;temp&#39;.&quot;</span><span class="p">)</span>
+            <span class="n">step_class</span> <span class="o">=</span> <span class="n">abstract_step</span><span class="o">.</span><span class="n">AbstractStep</span><span class="o">.</span><span class="n">get_step_class_for_key</span><span class="p">(</span>
+                <span class="n">module_name</span><span class="p">)</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="n">step_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+            <span class="n">step</span><span class="o">.</span><span class="n">set_step_name</span><span class="p">(</span><span class="n">step_name</span><span class="p">)</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">step_description</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="n">step_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">step</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">used_tools</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">used_tools</span><span class="p">)</span>
+
+        <span class="c1"># step two: set dependencies</span>
+        <span class="k">for</span> <span class="n">step_name</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">parent_step</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s1">&#39;_depends&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">parent_step</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Step </span><span class="si">%s</span><span class="s2"> specifies an undefined &quot;</span>
+                                   <span class="s2">&quot;dependency: </span><span class="si">%s</span><span class="s2">.&quot;</span>
+                                   <span class="o">%</span> <span class="p">(</span><span class="n">step_name</span><span class="p">,</span> <span class="n">parent_step</span><span class="p">))</span>
+                <span class="n">step</span><span class="o">.</span><span class="n">add_dependency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="n">parent_step</span><span class="p">])</span>
+
+        <span class="c1"># step three: perform topological sort</span>
+        <span class="c1"># if there&#39;s a cycle (yeah, the algorithm is O(n^2), tsk, tsk...)</span>
+
+        <span class="n">unassigned_steps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">assigned_steps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topological_step_order</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">unassigned_steps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># choose all tasks which have all dependencies resolved, either</span>
+            <span class="c1"># because they have no dependencies or are already assigned</span>
+            <span class="n">next_steps</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">step_name</span> <span class="ow">in</span> <span class="n">unassigned_steps</span><span class="p">:</span>
+                <span class="n">is_ready</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="n">step_name</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">dependencies</span><span class="p">:</span>
+                    <span class="n">dep_name</span> <span class="o">=</span> <span class="n">dep</span><span class="o">.</span><span class="n">get_step_name</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">dep_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">assigned_steps</span><span class="p">:</span>
+                        <span class="n">is_ready</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">is_ready</span> <span class="ow">and</span> <span class="n">step</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;source_controller&#39;</span><span class="p">:</span>
+                    <span class="c1"># make sure source_controller attempts to run first</span>
+                    <span class="n">next_steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">step_name</span><span class="p">]</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">is_ready</span><span class="p">:</span>
+                    <span class="n">next_steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_steps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;There is a cycle in the step dependencies.&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">step_name</span> <span class="ow">in</span> <span class="n">misc</span><span class="o">.</span><span class="n">natsorted</span><span class="p">(</span><span class="n">next_steps</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">topological_step_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step_name</span><span class="p">)</span>
+                <span class="n">assigned_steps</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">step_name</span><span class="p">)</span>
+                <span class="n">unassigned_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">step_name</span><span class="p">)</span>
+
+        <span class="c1"># step four: finalize step</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">print_source_runs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">step_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topological_step_order</span><span class="p">:</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="n">step_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">abstract_step</span><span class="o">.</span><span class="n">AbstractSourceStep</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="n">misc</span><span class="o">.</span><span class="n">natsorted</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">get_run_ids</span><span class="p">()):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">run_id</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">add_file_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">input_paths</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">output_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_dependencies</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;Different steps/runs/tags want to create &quot;</span>
+                           <span class="s2">&quot;the same output file: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">output_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_dependencies</span><span class="p">[</span><span class="n">output_path</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">input_paths</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">inpath</span> <span class="ow">in</span> <span class="n">input_paths</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">inpath</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_dependencies_reverse</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_dependencies_reverse</span><span class="p">[</span><span class="n">inpath</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_dependencies_reverse</span><span class="p">[</span><span class="n">inpath</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_task_for_output_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">task_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">output_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_id_for_output_file</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;More than one step is trying to create the &quot;</span>
+                           <span class="s2">&quot;same output file: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">output_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_id_for_output_file</span><span class="p">[</span><span class="n">output_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">task_id</span>
+
+        <span class="k">if</span> <span class="n">task_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_files_for_task_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_files_for_task_id</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_files_for_task_id</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_task_for_input_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">task_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">input_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_ids_for_input_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task_ids_for_input_file</span><span class="p">[</span><span class="n">input_path</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_ids_for_input_file</span><span class="p">[</span><span class="n">input_path</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">task_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_files_for_task_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_files_for_task_id</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_files_for_task_id</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Pipeline.get_task_for_file"><a class="viewcode-back" href="../api.html#pipeline.Pipeline.get_task_for_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_for_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the task for a given output file path.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">task_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_id_for_output_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">task_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_for_task_id</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Pipeline.setup_lmod"><a class="viewcode-back" href="../api.html#pipeline.Pipeline.setup_lmod">[docs]</a>    <span class="k">def</span> <span class="nf">setup_lmod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        If lmod is configured this functions sets the required environmental variables.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">module_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lmod&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;module_path&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">module_path</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MODULEPATH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">module_path</span></div>
+
+<div class="viewcode-block" id="Pipeline.check_tools"><a class="viewcode-back" href="../api.html#pipeline.Pipeline.check_tools">[docs]</a>    <span class="k">def</span> <span class="nf">check_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        checks whether all tools references by the configuration are available</span>
+<span class="sd">        and records their versions as determined by ``[tool] --version`` etc.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;tools&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">pool</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">getEffectiveLevel</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">show_status</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_interactive_shell</span><span class="p">():</span>
+            <span class="n">show_status</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;run&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">run</span><span class="p">):</span>
+            <span class="n">show_status</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">show_status</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_status</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[uap] Running tool check...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="n">iter_tools</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="n">pool</span><span class="o">.</span><span class="n">imap_unordered</span><span class="p">(</span>
+                <span class="n">check_tool</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span>
+            <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tools&#39;</span><span class="p">]),</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;tool check&#39;</span><span class="p">,</span>
+            <span class="n">bar_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{desc}</span><span class="s1">:</span><span class="si">{percentage:3.0f}</span><span class="s1">%|</span><span class="si">{bar:10}{r_bar}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">show_status</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tool_id</span><span class="p">,</span> <span class="n">tool_check_info</span> <span class="ow">in</span> <span class="n">iter_tools</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tool_versions</span><span class="p">[</span><span class="n">tool_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">tool_check_info</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="n">pool</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="n">iter_tools</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">has_interactive_shell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">isatty</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
+
+<div class="viewcode-block" id="Pipeline.notify"><a class="viewcode-back" href="../api.html#pipeline.Pipeline.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">attachment</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        prints a notification to the screen and optionally delivers the</span>
+<span class="sd">        message on additional channels (as defined by the configuration)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;notify&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">notify</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;notify&#39;</span><span class="p">]</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(https?://[^/]+)/([a-z0-9]+)$&#39;</span><span class="p">,</span> <span class="n">notify</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">host</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">token</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;curl&#39;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s1">&#39;-X&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;@-&#39;</span><span class="p">]</span>
+                    <span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;token&#39;</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="n">message</span><span class="p">}</span>
+                    <span class="k">if</span> <span class="n">attachment</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;attachment_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attachment</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;attachment_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span>
+                            <span class="n">attachment</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">])</span>
+                    <span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+                    <span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s1">&#39;Cloud not split patter into http(s)://host/token to notify: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;notify&#39;</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+                <span class="c1"># swallow all exception that happen here, failing notifications</span>
+                <span class="c1"># are no reason to crash the entire thing</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Notification of &quot;</span><span class="si">%s</span><span class="s1">&quot; failed with: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                               <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;notify&#39;</span><span class="p">],</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Pipeline.get_cluster_job_ids"><a class="viewcode-back" href="../api.html#pipeline.Pipeline.get_cluster_job_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_cluster_job_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        The argument less method returns a set the cluster job ids of all</span>
+<span class="sd">        subbmited jobs.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks_topologically_sorted</span><span class="p">:</span>
+            <span class="n">queued_ping_file</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">get_queued_ping_file</span><span class="p">()</span>
+            <span class="n">failed_qpf</span> <span class="o">=</span> <span class="n">queued_ping_file</span> <span class="o">+</span> <span class="s1">&#39;.bad&#39;</span>  <span class="c1"># alternative location</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">queued_ping_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fl</span><span class="p">:</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fl</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+                <span class="n">ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;cluster job id&#39;</span><span class="p">])</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">queued_ping_file</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;Could not read ping file </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                   <span class="p">(</span><span class="n">queued_ping_file</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">failed_qpf</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fl</span><span class="p">:</span>
+                            <span class="n">info</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fl</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+                        <span class="n">ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;cluster job id&#39;</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">failed_qpf</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;Could not read ping file </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                           <span class="p">(</span><span class="n">failed_qpf</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ids</span></div>
+
+<div class="viewcode-block" id="Pipeline.get_task_with_list"><a class="viewcode-back" href="../api.html#pipeline.Pipeline.get_task_with_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_with_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reruns a list of tasks, specified with the run argument.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">task_wish_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;run&#39;</span><span class="p">):</span>
+            <span class="n">specified_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">run</span>
+        <span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="n">specified_tasks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_for_task_id</span><span class="p">:</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_for_task_id</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">as_string</span><span class="p">:</span>
+                    <span class="n">task</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+                <span class="n">task_wish_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks_topologically_sorted</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">task</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">as_string</span><span class="p">:</span>
+                            <span class="n">task</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+                        <span class="n">task_wish_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">specified_tasks</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">task_wish_list</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;No task matches the requested pattern(s) &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span>
+                           <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">specified_tasks</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">specified_tasks</span> <span class="ow">and</span> <span class="n">exclusive</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">as_string</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks_topologically_sorted</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks_topologically_sorted</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">task_wish_list</span></div>
+
+    <span class="k">def</span> <span class="nf">check_ping_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_more_warnings</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">print_details</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fix_problems</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">run_problems</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">queue_problems</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">bad_problems</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">check_queue</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stat_output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_command</span><span class="p">(</span><span class="s1">&#39;stat&#39;</span><span class="p">)],</span>
+                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">):</span>
+            <span class="c1"># we don&#39;t have a stat tool here, if subprocess.CalledProcessError</span>
+            <span class="c1"># is raised</span>
+            <span class="n">check_queue</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">print_more_warnings</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">check_queue</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ce</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_command</span><span class="p">(</span><span class="s1">&#39;stat&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">ce</span> <span class="o">=</span> <span class="s2">&quot;a cluster engine&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Attention, we cannot check stale queued ping files because &quot;</span>
+                  <span class="s2">&quot;this host does not have </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">ce</span><span class="p">)</span>
+
+        <span class="n">running_jids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">check_queue</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stat_output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s1">&#39;COMPLETING&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="c1"># this is sluem specific and if a closing job is stuck</span>
+                    <span class="k">continue</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">jid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">running_jids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">jid</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="c1"># this is not a JID</span>
+                    <span class="k">pass</span>
+
+        <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks_topologically_sorted</span><span class="p">:</span>
+            <span class="n">queued_ping_file</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">get_queued_ping_file</span><span class="p">()</span>
+            <span class="n">bad_queued_ping_file</span> <span class="o">=</span> <span class="n">queued_ping_file</span> <span class="o">+</span> <span class="s1">&#39;.bad&#39;</span>
+            <span class="n">exec_ping_file</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">get_executing_ping_file</span><span class="p">()</span>
+            <span class="n">stale</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">is_stale</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">stale</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">exec_ping_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">),</span>
+                                     <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">exec_ping_file</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="n">e</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">start_time</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;start_time&#39;</span><span class="p">]</span>
+                    <span class="n">last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
+                        <span class="n">task</span><span class="o">.</span><span class="n">get_run</span><span class="p">()</span><span class="o">.</span><span class="n">fsc</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">exec_ping_file</span><span class="p">))</span>
+                    <span class="n">run_problems</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">task</span><span class="p">,</span> <span class="n">exec_ping_file</span><span class="p">,</span> <span class="n">stale</span><span class="p">,</span>
+                                         <span class="n">last_activity</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">check_queue</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">queued_ping_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">),</span>
+                                     <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">queued_ping_file</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="n">e</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;cluster job id&#39;</span><span class="p">])</span> <span class="ow">in</span> <span class="n">running_jids</span><span class="p">:</span>
+                        <span class="n">queue_problems</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">task</span><span class="p">,</span> <span class="n">queued_ping_file</span><span class="p">,</span>
+                                               <span class="n">info</span><span class="p">[</span><span class="s1">&#39;submit_time&#39;</span><span class="p">],</span>
+                                               <span class="n">info</span><span class="p">[</span><span class="s1">&#39;cluster job id&#39;</span><span class="p">]))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">bad_queued_ping_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">),</span>
+                                 <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">bad_queued_ping_file</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bad_problems</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">task</span><span class="p">,</span> <span class="n">bad_queued_ping_file</span><span class="p">,</span>
+                                     <span class="n">info</span><span class="p">[</span><span class="s1">&#39;submit_time&#39;</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;cluster job id&#39;</span><span class="p">]))</span>
+
+        <span class="n">show_hint</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">run_problems</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">show_hint</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Warning: There are </span><span class="si">%d</span><span class="s2"> stale run ping files.&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">run_problems</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">print_details</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+                <span class="n">run_problems</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                    <span class="n">run_problems</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span>
+                        <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">run_problems</span><span class="p">:</span>
+                    <span class="n">task</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">last_activity_difference</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="n">ran_for</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dead since </span><span class="si">%13s</span><span class="s2">, ran for </span><span class="si">%13s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">misc</span><span class="o">.</span><span class="n">duration_to_str</span><span class="p">(</span><span class="n">last_activity_difference</span><span class="p">),</span>
+                        <span class="n">misc</span><span class="o">.</span><span class="n">duration_to_str</span><span class="p">(</span><span class="n">ran_for</span><span class="p">),</span> <span class="n">task</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">queue_problems</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">show_hint</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Warning: There are </span><span class="si">%d</span><span class="s2"> tasks marked as queued, but they &quot;</span>\
+                    <span class="s2">&quot;do not seem to be queued.&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">queue_problems</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">print_details</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+                <span class="n">queue_problems</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                    <span class="n">queue_problems</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">queue_problems</span><span class="p">:</span>
+                    <span class="n">task</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">start_time</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="n">job_id</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="s2">&quot;submitted job </span><span class="si">%s</span><span class="s2"> at </span><span class="si">%13s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_problems</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Info: Found </span><span class="si">%d</span><span class="s2"> queue files of failed tasks.&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">bad_problems</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">print_details</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+                <span class="n">bad_problems</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                    <span class="n">bad_problems</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">bad_problems</span><span class="p">:</span>
+                    <span class="n">task</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">start_time</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="n">job_id</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="s2">&quot;submitted job </span><span class="si">%s</span><span class="s2"> at </span><span class="si">%13s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fix_problems</span><span class="p">:</span>
+            <span class="n">all_problems</span> <span class="o">=</span> <span class="n">run_problems</span>
+            <span class="n">all_problems</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">queue_problems</span><span class="p">)</span>
+            <span class="n">all_problems</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">bad_problems</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">all_problems</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">problem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Now deleting </span><span class="si">%s</span><span class="s2">...&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">show_hint</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">print_more_warnings</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">print_details</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">fix_problems</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hint: Run &#39;uap </span><span class="si">%s</span><span class="s2"> fix-problems --details&#39; to see the &quot;</span>
+                      <span class="s2">&quot;details.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">print_more_warnings</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fix_problems</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hint: Run &#39;uap </span><span class="si">%s</span><span class="s2"> fix-problems --first-error&#39; to &quot;</span>
+                      <span class="s2">&quot;investigate what happended.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fix_problems</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hint: Run &#39;uap </span><span class="si">%s</span><span class="s2"> fix-problems --srsly&#39; to fix these &quot;</span>
+                      <span class="s2">&quot;problems (that is, delete all problematic ping files).&quot;</span>
+                      <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No problematic ping files were found.&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">check_volatile_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">details</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">srsly</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">collected_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks_topologically_sorted</span><span class="p">:</span>
+            <span class="n">collected_files</span> <span class="o">|=</span> <span class="n">task</span><span class="o">.</span><span class="n">volatilize_if_possible</span><span class="p">(</span><span class="n">srsly</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">srsly</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collected_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">details</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">collected_files</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">total_size</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">collected_files</span><span class="p">:</span>
+                <span class="n">total_size</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hint: You could save </span><span class="si">%s</span><span class="s2"> of disk space by volatilizing </span><span class="si">%d</span><span class="s2"> &quot;</span>
+                  <span class="s2">&quot;output files.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">misc</span><span class="o">.</span><span class="n">bytes_to_str</span><span class="p">(</span><span class="n">total_size</span><span class="p">),</span>
+                                     <span class="nb">len</span><span class="p">(</span><span class="n">collected_files</span><span class="p">)))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Call &#39;uap </span><span class="si">%s</span><span class="s2"> volatilize --srsly&#39; to purge the files.&quot;</span>
+                  <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">autodetect_cluster_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cluster_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_config</span><span class="p">()</span>
+        <span class="c1"># Let&#39;s see if we can successfully run a cluster identity test</span>
+        <span class="c1"># Test all configured cluster types</span>
+        <span class="k">for</span> <span class="n">cluster_type</span> <span class="ow">in</span> <span class="n">cluster_config</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="c1"># Do we have an identity test command</span>
+            <span class="n">identity</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;answer&#39;</span><span class="p">]:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">identity</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster_config</span><span class="p">[</span><span class="n">cluster_type</span><span class="p">][</span><span class="s1">&#39;identity_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: Missing &#39;identity_</span><span class="si">%s</span><span class="s2">&#39; for </span><span class="si">%s</span><span class="s2">&quot;</span>
+                                   <span class="s2">&quot;cluster type.&quot;</span>
+                                   <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cluster_config_path</span><span class="p">,</span>
+                                      <span class="n">key</span><span class="p">,</span> <span class="n">cluster_type</span><span class="p">)</span>
+                                   <span class="p">)</span>
+            <span class="c1"># Now that we know let&#39;s test for that cluster</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identity</span><span class="p">[</span><span class="s1">&#39;answer&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">identity</span><span class="p">[</span><span class="s1">&#39;answer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">identity</span><span class="p">[</span><span class="s1">&#39;answer&#39;</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">answer</span> <span class="ow">in</span> <span class="n">identity</span><span class="p">[</span><span class="s1">&#39;answer&#39;</span><span class="p">]:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">identity</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">])</span>
+                            <span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">answer</span><span class="p">)):</span>
+                        <span class="k">return</span> <span class="n">cluster_type</span>
+                <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Cluster type could not be detected.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">get_cluster_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_type</span>
+
+    <span class="k">def</span> <span class="nf">set_cluster_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cluster_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cluster_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cluster_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_config</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;Cluster type &quot;</span><span class="si">%s</span><span class="s1">&quot; not configured.&#39;</span> <span class="o">%</span> <span class="n">cluster_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_type</span> <span class="o">=</span> <span class="n">cluster_type</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Shorthand to retrieve a cluster-type-dependent command or filename</span>
+<span class="sd">    (cc == cluster command).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">get_cluster_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_type</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_config</span><span class="p">()[</span><span class="n">ct</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s1">&#39;The option &quot;</span><span class="si">%s</span><span class="s1">&quot; is not available for the cluster &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ct</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_config</span><span class="p">()[</span><span class="n">ct</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Shorthand to retrieve a cluster-type-dependent command line part (this is a</span>
+<span class="sd">    list)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">get_cluster_command_cli_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_config</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cluster_type</span><span class="p">()][</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">nval</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">value</span><span class="p">])</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nval</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;The option </span><span class="si">%s</span><span class="s1"> requires a tuple &#39;</span>
+                               <span class="s1">&#39;of </span><span class="si">%d</span><span class="s1"> values to be placed into </span><span class="si">%s</span><span class="s1"> but the &#39;</span>
+                               <span class="s1">&#39;values are </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">nval</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="ow">in</span> <span class="n">part</span><span class="p">:</span>
+                    <span class="n">options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span> <span class="o">%</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">part</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)])</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="n">part</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">options</span>
+        <span class="k">if</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">result</span> <span class="o">%</span> <span class="n">value</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">result</span><span class="p">,</span> <span class="n">value</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christoph Kämpf, Michael Specht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

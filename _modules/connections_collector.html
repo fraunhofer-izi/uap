@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>connections_collector &mdash; uap 2.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> uap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introducing <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html#software-design">Software Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html#recommended-uap-workflow">Recommended <strong>uap</strong> Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to.html">Quick Start <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Analysis Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html#cluster-configuration-file">Cluster Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interaction.html">Command-Line Usage of <strong>uap</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extension.html">Add New Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platforms.html">Tested Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotation.html">Annotation Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../steps.html">Available steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers.html">Information for uap Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">uap</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>connections_collector</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for connections_collector</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">from</span> <span class="nn">uaperrors</span> <span class="kn">import</span> <span class="n">UAPError</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;uap_logger&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ConnectionsCollector"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector">[docs]</a><span class="k">class</span> <span class="nc">ConnectionsCollector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A ConnectionsCollector helps to collect and query file connections.</span>
+<span class="sd">    An instance `cc` is generated for each step and passed to its</span>
+<span class="sd">    ``runs`` method. For backwards compatibility reasons it can be</span>
+<span class="sd">    queryed like a dictionary ``cc[run_id][connection]``. ``cc``</span>
+<span class="sd">    can be used in the course of a step to dicide how to use the</span>
+<span class="sd">    input runs and connections.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_name</span> <span class="o">=</span> <span class="n">step_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connections</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_run_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_current_run_id</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_by_cons_empty</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_by_cons_none_empty</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_con_of_all_runs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">existing_connections</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ConnectionsCollector.switch_run_id"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.switch_run_id">[docs]</a>    <span class="k">def</span> <span class="nf">switch_run_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set a default run id to use in subsequent calls.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_run_id</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_run_id</span> <span class="o">=</span> <span class="n">run_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_current_run_id</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="nf">_init_run_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">run_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_run_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;No run id given.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">run_id</span>
+
+<div class="viewcode-block" id="ConnectionsCollector.add_empty"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.add_empty">[docs]</a>    <span class="k">def</span> <span class="nf">add_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Makes a connection withou files.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">run_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_run_id</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">run_id</span><span class="p">][</span><span class="n">connection</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_by_cons_empty</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_by_cons_empty</span><span class="p">[</span><span class="n">connection</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">existing_connections</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_con_of_all_runs</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># reset cache</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Found connection </span><span class="si">%s</span><span class="s2"> which is declared empty&quot;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">connection</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.add_connection"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.add_connection">[docs]</a>    <span class="k">def</span> <span class="nf">add_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Saves the names in ``files`` for a new ``connection``.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;&quot;files&quot; must be a list but is a </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                           <span class="n">files</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">run_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_run_id</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;The passed connection must be a string.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">connection</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;in/&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;Input connections muss start with &quot;in/&quot;.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">run_id</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">run_id</span><span class="p">][</span><span class="n">connection</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_by_cons_none_empty</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_by_cons_none_empty</span><span class="p">[</span><span class="n">connection</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">existing_connections</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_con_of_all_runs</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># reset cache</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%s</span><span class="s2"> to connect </span><span class="si">%s</span><span class="s2"> with run </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_name</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">run_id</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.connect"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">connections</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Makes connections between parent and child step and returns</span>
+<span class="sd">        the utilized parent connections as &quot;parent/name&quot;.</span>
+<span class="sd">        The passed connections need to be in the format as in the</span>
+<span class="sd">        pipline configuration file. If no connections are passed it</span>
+<span class="sd">        connects all equally named connections.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">parent_name</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_step_name</span><span class="p">()</span>
+        <span class="n">parent_out_conns</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_out_connections</span><span class="p">(</span><span class="n">strip_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">child_name</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get_step_name</span><span class="p">()</span>
+        <span class="n">must_connect</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">connections</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># get equally named connections</span>
+            <span class="n">ins</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get_in_connections</span><span class="p">(</span><span class="n">strip_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">conns</span> <span class="o">=</span> <span class="n">parent_out_conns</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ins</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s1">&#39;There are no default connections between &#39;</span>
+                    <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> and its dependency </span><span class="si">%s</span><span class="s1">. The parent out connections &#39;</span>
+                    <span class="s1">&#39;are </span><span class="si">%s</span><span class="s1"> and the child in connections are </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="n">parent_name</span><span class="p">,</span> <span class="n">child_name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">parent_out_conns</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">ins</span><span class="p">)))</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="n">make_connections</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s1">&#39;in/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">conn</span><span class="p">,</span>
+                 <span class="s1">&#39;out/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">conn</span><span class="p">,</span>
+                 <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">parent_name</span><span class="p">,</span> <span class="n">conn</span><span class="p">))</span> <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="n">conns</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connections</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="c1"># extract connections from config</span>
+            <span class="n">make_connections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">pre_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parent_name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">in_conn</span><span class="p">,</span> <span class="n">out_conns</span> <span class="ow">in</span> <span class="n">connections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_conns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">out_conns</span> <span class="o">=</span> <span class="p">[</span><span class="n">out_conns</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">out_conn</span> <span class="ow">in</span> <span class="n">out_conns</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">out_conn</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">parent_name</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">):</span>
+                        <span class="n">stripped_out_conn</span> <span class="o">=</span> <span class="n">out_conn</span><span class="p">[</span><span class="n">pre_len</span><span class="p">:]</span>
+                        <span class="n">p_out</span> <span class="o">=</span> <span class="s1">&#39;out/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">stripped_out_conn</span>
+                        <span class="k">if</span> <span class="n">stripped_out_conn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parent_out_conns</span><span class="p">:</span>
+                            <span class="n">avail</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">parent_out_conns</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                                <span class="s1">&#39;The connection &quot;</span><span class="si">%s</span><span class="s1">&quot; set in &quot;</span><span class="si">%s</span><span class="s1">&quot; &#39;</span>
+                                <span class="s1">&#39;is not an out connection of &quot;</span><span class="si">%s</span><span class="s1">&quot;. &#39;</span>
+                                <span class="s1">&#39;Available out connections are: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                <span class="p">(</span><span class="n">out_conn</span><span class="p">,</span> <span class="n">child_name</span><span class="p">,</span> <span class="n">parent_name</span><span class="p">,</span> <span class="n">avail</span><span class="p">))</span>
+                        <span class="n">make_connections</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">in_conn</span><span class="p">,</span> <span class="n">p_out</span><span class="p">,</span> <span class="n">out_conn</span><span class="p">))</span>
+                        <span class="n">must_connect</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">out_conn</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;The passed connections need to be a dictionay.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># make the connections</span>
+        <span class="n">used_conns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">parent_run_id</span> <span class="ow">in</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_runs</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">switch_run_id</span><span class="p">(</span><span class="n">parent_run_id</span><span class="p">)</span>
+            <span class="n">parent_run</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">parent_run_id</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">in_conn</span><span class="p">,</span> <span class="n">out_conn</span><span class="p">,</span> <span class="n">parent_con</span> <span class="ow">in</span> <span class="n">make_connections</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">out_conn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parent_run</span><span class="o">.</span><span class="n">get_out_connections</span><span class="p">():</span>
+                    <span class="k">continue</span>
+                <span class="n">output_files</span> <span class="o">=</span> <span class="n">parent_run</span>\
+                    <span class="o">.</span><span class="n">get_output_files_abspath_for_out_connection</span><span class="p">(</span><span class="n">out_conn</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">in_conn</span><span class="p">,</span> <span class="n">output_files</span><span class="p">)</span>
+                <span class="n">used_conns</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">parent_con</span><span class="p">)</span>
+
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">must_connect</span> <span class="o">-</span> <span class="n">used_conns</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s1">&#39;The connection(s) </span><span class="si">%s</span><span class="s1"> required by the step &quot;</span><span class="si">%s</span><span class="s1">&quot; are &#39;</span>
+                <span class="s1">&#39;optional output of step &quot;</span><span class="si">%s</span><span class="s1">&quot; and not produced.&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">missing</span><span class="p">),</span> <span class="n">child_name</span><span class="p">,</span> <span class="n">parent_name</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">used_conns</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.get_connection"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.get_connection">[docs]</a>    <span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of file names for the ``connection``.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">run_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_run_id</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="n">cons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">run_id</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">connection</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cons</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span><span class="s1">&#39;The input run </span><span class="si">%s</span><span class="s1"> of </span><span class="si">%s</span><span class="s1"> has no connection </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_name</span><span class="p">,</span> <span class="n">connection</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">cons</span><span class="p">[</span><span class="n">run_id</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.connection_items"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.connection_items">[docs]</a>    <span class="k">def</span> <span class="nf">connection_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns all (run_id, [files]) pairs for the given connection.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">conns</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">conns</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">conns</span><span class="p">[</span><span class="n">connection</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">_runs_with_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">with_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">runs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_cons_none_empty</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">runs</span> <span class="o">=</span> <span class="n">runs</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_cons_none_empty</span><span class="p">[</span><span class="n">connection</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">with_empty</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_cons_empty</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">runs</span> <span class="o">=</span> <span class="n">runs</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_cons_empty</span><span class="p">[</span><span class="n">connection</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">runs</span>
+
+<div class="viewcode-block" id="ConnectionsCollector.get_runs_with_connections"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.get_runs_with_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_runs_with_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">with_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns all run ids that have requested all connections.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connections</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_with_connection</span><span class="p">(</span><span class="n">connections</span><span class="p">,</span> <span class="n">with_empty</span><span class="p">)</span>
+        <span class="n">cons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span>
+        <span class="n">run_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_with_connection</span><span class="p">(</span><span class="n">cons</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">with_empty</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">cons</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">runs_of_con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_with_connection</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">with_empty</span><span class="p">)</span>
+            <span class="n">run_ids</span> <span class="o">=</span> <span class="n">run_ids</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">runs_of_con</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">run_ids</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.get_runs_with_any"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.get_runs_with_any">[docs]</a>    <span class="k">def</span> <span class="nf">get_runs_with_any</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">with_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns all run ids with any of the given connections.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connections</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">connections</span> <span class="o">=</span> <span class="p">[</span><span class="n">connections</span><span class="p">]</span>
+        <span class="n">cons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span>
+        <span class="n">run_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_with_connection</span><span class="p">(</span><span class="n">cons</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">with_empty</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">cons</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">runs_of_con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_with_connection</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">with_empty</span><span class="p">)</span>
+            <span class="n">run_ids</span> <span class="o">=</span> <span class="n">run_ids</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">runs_of_con</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">run_ids</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.get_runs_without_any"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.get_runs_without_any">[docs]</a>    <span class="k">def</span> <span class="nf">get_runs_without_any</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">with_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns runs that have none of the passed connections.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">runs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">runs_with_any</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_runs_with_any</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">runs</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">runs_with_any</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.look_for_unique"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.look_for_unique">[docs]</a>    <span class="k">def</span> <span class="nf">look_for_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Looks for a unique file in the connection and returns it.</span>
+<span class="sd">        E.g., to find a reference assembly among all parent runs.</span>
+<span class="sd">        If NO runs come with the connection it returns None and if</span>
+<span class="sd">        MORE THAN ONE run comes with the connection an UAPError is raised.</span>
+<span class="sd">        The value passed with include is also counted.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_exists</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span> <span class="ow">and</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s1">&#39;In step </span><span class="si">%s</span><span class="s1"> runs come with </span><span class="si">%s</span><span class="s1"> but it is set &#39;</span>
+                <span class="s1">&#39;to </span><span class="si">%s</span><span class="s1"> through an option.&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_name</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">include</span><span class="p">))</span>
+
+        <span class="n">ref_run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_runs_with_connections</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="n">with_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref_run</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">UAPError</span><span class="p">(</span>
+                <span class="s1">&#39;More then one but not all runs come with </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span>
+                <span class="n">connection</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref_run</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                    <span class="s1">&#39;In step </span><span class="si">%s</span><span class="s1">, value supplied by connection </span><span class="si">%s</span><span class="s1"> but&#39;</span>
+                    <span class="s1">&#39;option is set to </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_name</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">include</span><span class="p">))</span>
+            <span class="n">ref_run</span> <span class="o">=</span> <span class="n">ref_run</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="c1"># ref_run is a temporary set</span>
+            <span class="n">con_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">ref_run</span><span class="p">][</span><span class="n">connection</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">con_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UAPError</span><span class="p">(</span>
+                    <span class="s1">&#39;In step </span><span class="si">%s</span><span class="s1"> more than one file is passed through </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_name</span><span class="p">,</span> <span class="n">connection</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">con_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">include</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.connection_exists"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.connection_exists">[docs]</a>    <span class="k">def</span> <span class="nf">connection_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a logical indication whether the requested connection exists.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">existing_connections</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.exists_connection_for_run"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.exists_connection_for_run">[docs]</a>    <span class="k">def</span> <span class="nf">exists_connection_for_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a logical indication whether the requested connection exists</span>
+<span class="sd">        for the given/current run.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">run_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_run_id</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">run_id</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.all_runs_have_connection"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.all_runs_have_connection">[docs]</a>    <span class="k">def</span> <span class="nf">all_runs_have_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a logical indication whether all saved runs have the queried</span>
+<span class="sd">        ``connection``.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_con_of_all_runs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># calculate and cache connections of all runs</span>
+            <span class="n">con_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_con_of_all_runs</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
+                <span class="o">*</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">con_list</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">con</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_con_of_all_runs</span> <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">connection</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_con_of_all_runs</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.any_runs_have_connection"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.any_runs_have_connection">[docs]</a>    <span class="k">def</span> <span class="nf">any_runs_have_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a logical indication whether any saved runs have the queried</span>
+<span class="sd">        ``connection``.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">connection</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">run_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;In step </span><span class="si">%s</span><span class="s1"> there is no connection for run </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_name</span><span class="p">,</span> <span class="n">run_id</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">run_id</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ConnectionsCollector.values"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.values">[docs]</a>    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Emulates dict.values().</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConnectionsCollector.items"><a class="viewcode-back" href="../api.html#connections_collector.ConnectionsCollector.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Emulates dict.items().</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christoph Kämpf, Michael Specht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
